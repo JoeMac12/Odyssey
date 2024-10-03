@@ -48,7 +48,7 @@ public class RocketController : MonoBehaviour
 
 		ApplyRotation(rotationInput, deltaEulerAngles);
 
-		if (rotationInput.magnitude == 0f && isThrusting)
+		if (rotationInput.magnitude == 0f && isThrusting && currentFuel > 0f)
 		{
 			StraightenRocket(deltaEulerAngles);
 		}
