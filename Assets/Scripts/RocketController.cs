@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class RocketController : MonoBehaviour
 {
@@ -13,9 +14,16 @@ public class RocketController : MonoBehaviour
 	public float fuelRate = 10f;
 	public Image fuelBar;
 
+	public TMP_Text speedText;
+	public TMP_Text altitudeText;
+	public TMP_Text flightTimeText;
+	public TMP_Text bankAngleText;
+
 	private float currentFuel;
 	private Rigidbody rb;
 	private Quaternion initialRotation;
+	private float flightTime;
+	private bool isFlying;
 
 	void Start()
 	{
@@ -23,6 +31,8 @@ public class RocketController : MonoBehaviour
 		initialRotation = transform.rotation;
 		currentFuel = maxFuel;
 		UpdateFuelBar();
+		flightTime = 0f;
+		isFlying = false;
 	}
 
 	void FixedUpdate()
@@ -32,6 +42,16 @@ public class RocketController : MonoBehaviour
 		{
 			rb.AddForce(transform.up * thrust);
 			ConsumeFuel();
+			if (!isFlying)
+			{
+				isFlying = true;
+				flightTime = 0f;
+			}
+		}
+
+		if (isFlying)
+		{
+			flightTime += Time.fixedDeltaTime;
 		}
 
 		float moveHorizontal = Input.GetAxis("Horizontal");
@@ -57,6 +77,8 @@ public class RocketController : MonoBehaviour
 		{
 			rb.velocity = rb.velocity.normalized * maxVelocity;
 		}
+
+		UpdateUI(deltaEulerAngles);
 	}
 
 	float NormalizeAngle(float angle)
@@ -118,5 +140,19 @@ public class RocketController : MonoBehaviour
 		{
 			fuelBar.color = Color.red;
 		}
+	}
+
+	void UpdateUI(Vector3 deltaEulerAngles)
+	{
+		float speedMPH = rb.velocity.magnitude * 2.237f;
+		speedText.text = "Speed: " + speedMPH.ToString("F1") + " MPH";
+
+		float altitude = transform.position.y * 3.281f;
+		altitudeText.text = "Altitude: " + altitude.ToString("F1") + " ft";
+
+		flightTimeText.text = "Flight Time: " + flightTime.ToString("F1") + " s";
+
+		float bankAngle = deltaEulerAngles.z;
+		bankAngleText.text = "Bank Angle: " + bankAngle.ToString("F1") + "°";
 	}
 }
