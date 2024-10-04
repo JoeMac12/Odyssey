@@ -19,6 +19,8 @@ public class RocketController : MonoBehaviour
 	public TMP_Text flightTimeText;
 	public TMP_Text bankAngleText;
 
+	public AudioSource thrustSound;
+
 	private float currentFuel;
 	private Rigidbody rb;
 	private Quaternion initialRotation;
@@ -33,6 +35,11 @@ public class RocketController : MonoBehaviour
 		UpdateFuelBar();
 		flightTime = 0f;
 		isFlying = false;
+
+		if (thrustSound != null)
+		{
+			thrustSound.Stop();
+		}
 	}
 
 	void FixedUpdate()
@@ -46,6 +53,18 @@ public class RocketController : MonoBehaviour
 			{
 				isFlying = true;
 				flightTime = 0f;
+			}
+
+			if (thrustSound != null && !thrustSound.isPlaying)
+			{
+				thrustSound.Play();
+			}
+		}
+		else
+		{
+			if (thrustSound != null && thrustSound.isPlaying)
+			{
+				thrustSound.Stop();
 			}
 		}
 
