@@ -20,12 +20,16 @@ public class RocketController : MonoBehaviour
 	public TMP_Text bankAngleText;
 
 	public AudioSource thrustSound;
+	public Light rocketLight;
+	public float minIntensity = 8f;
+	public float maxIntensity = 10f;
 
 	private float currentFuel;
 	private Rigidbody rb;
 	private Quaternion initialRotation;
 	private float flightTime;
 	private bool isFlying;
+	private bool thrustLightRunning = false;
 
 	void Start()
 	{
@@ -39,6 +43,11 @@ public class RocketController : MonoBehaviour
 		if (thrustSound != null)
 		{
 			thrustSound.Stop();
+		}
+
+		if (rocketLight != null)
+		{
+			rocketLight.enabled = false;
 		}
 	}
 
@@ -59,12 +68,25 @@ public class RocketController : MonoBehaviour
 			{
 				thrustSound.Play();
 			}
+
+			if (rocketLight != null && !thrustLightRunning)
+			{
+				rocketLight.enabled = true;
+				StartCoroutine(RandomLightPower());
+			}
 		}
 		else
 		{
 			if (thrustSound != null && thrustSound.isPlaying)
 			{
 				thrustSound.Stop();
+			}
+
+			if (rocketLight != null && thrustLightRunning)
+			{
+				rocketLight.enabled = false;
+				StopCoroutine(RandomLightPower());
+				thrustLightRunning = false;
 			}
 		}
 
@@ -173,5 +195,16 @@ public class RocketController : MonoBehaviour
 
 		float bankAngle = deltaEulerAngles.z;
 		bankAngleText.text = "Bank Angle: " + bankAngle.ToString("F1") + "°";
+	}
+
+	IEnumerator RandomLightPower()
+	{
+		thrustLightRunning = true;
+		while (true)
+		{
+			float randomIntensity = Random.Range(minIntensity, maxIntensity);
+			rocketLight.intensity = randomIntensity;
+			yield return new WaitForSeconds(0.05f);
+		}
 	}
 }
