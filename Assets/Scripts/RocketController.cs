@@ -54,8 +54,8 @@ public class RocketController : MonoBehaviour
 			flightTime += Time.fixedDeltaTime;
 		}
 
-		float moveHorizontal = Input.GetAxis("Horizontal");
-		float moveVertical = Input.GetAxis("Vertical");
+		float moveHorizontal = -Input.GetAxis("Horizontal");
+		float moveVertical = -Input.GetAxis("Vertical");
 		Vector3 rotationInput = new Vector3(moveVertical, 0.0f, -moveHorizontal);
 
 		Quaternion currentRotation = transform.rotation;
