@@ -31,6 +31,14 @@ public class LevelManager : MonoBehaviour
 		loadingScreen.SetActive(false);
 	}
 
+	void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.R))
+		{
+			RestartScene();
+		}
+	}
+
 	public void PlayGame()
 	{
 		StartCoroutine(LoadSceneAsync("Gameplay"));
@@ -70,6 +78,11 @@ public class LevelManager : MonoBehaviour
 		canvasGroup.alpha = 0;
 
 		loadingScreen.SetActive(false);
+	}
+
+	public void RestartScene()
+	{
+		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}
 
 	public void QuitGame()
