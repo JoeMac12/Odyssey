@@ -14,6 +14,13 @@ public class RocketController : MonoBehaviour
 	public float fuelRate = 10f;
 	public Image fuelBar;
 
+	public float maxHealth = 100f;
+	public float currentHealth;
+	public float armor = 0f;
+
+	//public GameObject explosionPrefab;
+	public float explosionDelay = 3f;
+
 	public TMP_Text speedText;
 	public TMP_Text altitudeText;
 	public TMP_Text flightTimeText;
@@ -24,21 +31,30 @@ public class RocketController : MonoBehaviour
 	public float minIntensity = 8f;
 	public float maxIntensity = 10f;
 
+	[HideInInspector]
+	public Rigidbody rb;
+
 	private float currentFuel;
-	private Rigidbody rb;
 	private Quaternion initialRotation;
+	private float lastPositiveVerticalSpeed;
+	private bool isExploding = false;
+	private bool hasLaunched = false;
 	private float flightTime;
-	private bool isFlying;
 	private bool thrustLightRunning = false;
+
+	public bool IsThrusting { get; private set; }
+	public bool IsExploded { get; private set; }
+	public float FlightStartTime { get; private set; }
 
 	void Start()
 	{
 		rb = GetComponent<Rigidbody>();
 		initialRotation = transform.rotation;
 		currentFuel = maxFuel;
+		currentHealth = maxHealth;
+		IsExploded = false;
 		UpdateFuelBar();
 		flightTime = 0f;
-		isFlying = false;
 
 		if (thrustSound != null)
 		{
@@ -53,16 +69,20 @@ public class RocketController : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		bool isThrusting = Input.GetKey(KeyCode.Space);
-		if (isThrusting && currentFuel > 0f)
+		if (IsExploded) return;
+
+		IsThrusting = Input.GetKey(KeyCode.Space) && currentFuel > 0f;
+
+		if (IsThrusting)
 		{
+			if (!hasLaunched)
+			{
+				hasLaunched = true;
+				FlightStartTime = Time.time;
+			}
+
 			rb.AddForce(transform.up * thrust);
 			ConsumeFuel();
-			if (!isFlying)
-			{
-				isFlying = true;
-				flightTime = 0f;
-			}
 
 			if (thrustSound != null && !thrustSound.isPlaying)
 			{
@@ -90,14 +110,31 @@ public class RocketController : MonoBehaviour
 			}
 		}
 
-		if (isFlying)
+		if (hasLaunched)
 		{
 			flightTime += Time.fixedDeltaTime;
+
+			if (rb.velocity.y > 0)
+			{
+				lastPositiveVerticalSpeed = Time.time;
+			}
+			else if (Time.time - lastPositiveVerticalSpeed > explosionDelay && !isExploding)
+			{
+				StartCoroutine(ExplodeRocket());
+			}
 		}
 
+		ApplyRotation();
+		LimitVelocity();
+		UpdateUI();
+	}
+
+	void ApplyRotation()
+	{
 		float moveHorizontal = -Input.GetAxis("Horizontal");
 		float moveVertical = -Input.GetAxis("Vertical");
-		Vector3 rotationInput = new Vector3(moveVertical, 0.0f, -moveHorizontal);
+
+		Vector3 rotation = new Vector3(moveVertical, 0.0f, -moveHorizontal);
 
 		Quaternion currentRotation = transform.rotation;
 		Quaternion deltaRotation = Quaternion.Inverse(initialRotation) * currentRotation;
@@ -107,19 +144,20 @@ public class RocketController : MonoBehaviour
 		deltaEulerAngles.y = NormalizeAngle(deltaEulerAngles.y);
 		deltaEulerAngles.z = NormalizeAngle(deltaEulerAngles.z);
 
-		ApplyRotation(rotationInput, deltaEulerAngles);
+		if (Mathf.Abs(deltaEulerAngles.x) < maxTurnAngle || Mathf.Sign(rotation.x) != Mathf.Sign(deltaEulerAngles.x))
+		{
+			rb.AddRelativeTorque(rotation.x * rotationSpeed, 0f, 0f);
+		}
 
-		if (rotationInput.magnitude == 0f && isThrusting && currentFuel > 0f)
+		if (Mathf.Abs(deltaEulerAngles.z) < maxTurnAngle || Mathf.Sign(rotation.z) != Mathf.Sign(deltaEulerAngles.z))
+		{
+			rb.AddRelativeTorque(0f, 0f, rotation.z * rotationSpeed);
+		}
+
+		if (rotation.magnitude == 0f && IsThrusting && currentFuel > 0f)
 		{
 			StraightenRocket(deltaEulerAngles);
 		}
-
-		if (rb.velocity.magnitude > maxVelocity)
-		{
-			rb.velocity = rb.velocity.normalized * maxVelocity;
-		}
-
-		UpdateUI(deltaEulerAngles);
 	}
 
 	float NormalizeAngle(float angle)
@@ -127,19 +165,6 @@ public class RocketController : MonoBehaviour
 		while (angle > 180f) angle -= 360f;
 		while (angle < -180f) angle += 360f;
 		return angle;
-	}
-
-	void ApplyRotation(Vector3 rotationInput, Vector3 deltaEulerAngles)
-	{
-		if (Mathf.Abs(deltaEulerAngles.x) < maxTurnAngle || Mathf.Sign(rotationInput.x) != Mathf.Sign(deltaEulerAngles.x))
-		{
-			rb.AddRelativeTorque(rotationInput.x * rotationSpeed, 0f, 0f);
-		}
-
-		if (Mathf.Abs(deltaEulerAngles.z) < maxTurnAngle || Mathf.Sign(rotationInput.z) != Mathf.Sign(deltaEulerAngles.z))
-		{
-			rb.AddRelativeTorque(0f, 0f, rotationInput.z * rotationSpeed);
-		}
 	}
 
 	void StraightenRocket(Vector3 deltaEulerAngles)
@@ -154,6 +179,14 @@ public class RocketController : MonoBehaviour
 		{
 			float correctionTorqueZ = -Mathf.Sign(deltaEulerAngles.z) * rotationSpeed * 0.5f;
 			rb.AddRelativeTorque(0f, 0f, correctionTorqueZ);
+		}
+	}
+
+	void LimitVelocity()
+	{
+		if (rb.velocity.magnitude > maxVelocity)
+		{
+			rb.velocity = rb.velocity.normalized * maxVelocity;
 		}
 	}
 
@@ -183,7 +216,7 @@ public class RocketController : MonoBehaviour
 		}
 	}
 
-	void UpdateUI(Vector3 deltaEulerAngles)
+	void UpdateUI()
 	{
 		float speedMPH = rb.velocity.magnitude * 2.237f;
 		speedText.text = "Speed: " + speedMPH.ToString("F1") + " MPH";
@@ -193,8 +226,67 @@ public class RocketController : MonoBehaviour
 
 		flightTimeText.text = "Flight Time: " + flightTime.ToString("F1") + " s";
 
-		float bankAngle = deltaEulerAngles.z;
+		Quaternion deltaRotation = Quaternion.Inverse(initialRotation) * transform.rotation;
+		float bankAngle = NormalizeAngle(deltaRotation.eulerAngles.z);
 		bankAngleText.text = "Bank Angle: " + bankAngle.ToString("F1") + "°";
+	}
+
+	public void TakeDamage(float damage)
+	{
+		float damageAfterArmor = Mathf.Max(0, damage - armor);
+		currentHealth -= damageAfterArmor;
+
+		if (currentHealth <= 0 && !isExploding)
+		{
+			StartCoroutine(ExplodeRocket());
+		}
+	}
+
+	IEnumerator ExplodeRocket()
+	{
+		isExploding = true;
+		IsExploded = true;
+
+		this.enabled = false;
+
+		//Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+
+		gameObject.SetActive(false);
+
+		GameManager.Instance.OnRocketExploded();
+
+		yield return new WaitForSeconds(1f);
+
+		rb.isKinematic = true;
+	}
+
+	public void ResetRocket(Vector3 position)
+	{
+		transform.position = position;
+		transform.rotation = initialRotation;
+		rb.velocity = Vector3.zero;
+		rb.angularVelocity = Vector3.zero;
+		currentFuel = maxFuel;
+		currentHealth = maxHealth;
+		isExploding = false;
+		IsExploded = false;
+		hasLaunched = false;
+		flightTime = 0f;
+		this.enabled = true;
+		gameObject.SetActive(true);
+		rb.isKinematic = false;
+		UpdateFuelBar();
+
+		if (thrustSound != null)
+		{
+			thrustSound.Stop();
+		}
+
+		if (rocketLight != null)
+		{
+			rocketLight.enabled = false;
+			thrustLightRunning = false;
+		}
 	}
 
 	IEnumerator RandomLightPower()
