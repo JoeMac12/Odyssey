@@ -79,6 +79,7 @@ public class RocketController : MonoBehaviour
 			{
 				hasLaunched = true;
 				FlightStartTime = Time.time;
+				lastPositiveVerticalSpeed = Time.time;
 			}
 
 			rb.AddForce(transform.up * thrust);
