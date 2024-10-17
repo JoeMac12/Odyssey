@@ -50,21 +50,7 @@ public class RocketController : MonoBehaviour
 	{
 		rb = GetComponent<Rigidbody>();
 		initialRotation = transform.rotation;
-		currentFuel = maxFuel;
-		currentHealth = maxHealth;
-		IsExploded = false;
-		UpdateFuelBar();
-		flightTime = 0f;
-
-		if (thrustSound != null)
-		{
-			thrustSound.Stop();
-		}
-
-		if (rocketLight != null)
-		{
-			rocketLight.enabled = false;
-		}
+		ResetRocket(transform.position);
 	}
 
 	void FixedUpdate()

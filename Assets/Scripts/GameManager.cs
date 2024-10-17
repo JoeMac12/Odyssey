@@ -9,7 +9,9 @@ public class GameManager : MonoBehaviour
 	public static GameManager Instance;
 
 	public RocketController rocketController;
+	public UpgradeManager upgradeManager;
 	public GameObject performancePanel;
+	public GameObject upgradePanel;
 	public float panelFadeDuration = 1f;
 
 	[Header("Performance UI")]
@@ -18,6 +20,8 @@ public class GameManager : MonoBehaviour
 	public TMP_Text flightTimeText;
 	public TMP_Text distanceTravelledText;
 	public TMP_Text moneyEarnedText;
+	public Button openUpgradeMenuButton;
+	public Button closeUpgradeMenuButton;
 
 	[Header("Money Multipliers")]
 	public float altitudeMultiplier = 0.1f;
@@ -52,7 +56,11 @@ public class GameManager : MonoBehaviour
 	{
 		initialPosition = rocketController.transform.position;
 		performancePanel.SetActive(false);
+		upgradePanel.SetActive(false);
 		ResetFlightStats();
+
+		openUpgradeMenuButton.onClick.AddListener(OpenUpgradeMenu);
+		closeUpgradeMenuButton.onClick.AddListener(CloseUpgradeMenu);
 	}
 
 	private void Update()
@@ -114,6 +122,8 @@ public class GameManager : MonoBehaviour
 		float moneyEarned = CalculateMoneyEarned(maxAltitude, maxSpeed, flightTime, distanceTravelled);
 		totalMoneyEarned += moneyEarned;
 		moneyEarnedText.text = $"Money Earned: ${moneyEarned:F2}";
+
+		upgradeManager.UpdateCurrentMoneyText();
 	}
 
 	private float CalculateMoneyEarned(float altitude, float speed, float time, float distance)
@@ -124,16 +134,18 @@ public class GameManager : MonoBehaviour
 			(distance * distanceMultiplier);
 	}
 
-	// Upgrade menu still in progress
-	public void ProceedToUpgradeMenu()
+	public void OpenUpgradeMenu()
 	{
-		rocketController.ResetRocket(initialPosition);
-
-		ResetFlightStats();
-
 		performancePanel.SetActive(false);
+		upgradePanel.SetActive(true);
+		upgradeManager.UpdateCurrentMoneyText();
+	}
 
-		Debug.Log($"Opening Upgrade Menu... Total Money: ${totalMoneyEarned:F2}");
+	public void CloseUpgradeMenu()
+	{
+		upgradePanel.SetActive(false);
+		rocketController.ResetRocket(initialPosition);
+		ResetFlightStats();
 	}
 
 	private void ResetFlightStats()
@@ -153,6 +165,7 @@ public class GameManager : MonoBehaviour
 		if (amount <= totalMoneyEarned)
 		{
 			totalMoneyEarned -= amount;
+			upgradeManager.UpdateCurrentMoneyText();
 		}
 		else
 		{
