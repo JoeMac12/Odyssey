@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,6 +23,13 @@ public class GameManager : MonoBehaviour
 	public TMP_Text moneyEarnedText;
 	public Button openUpgradeMenuButton;
 	public Button closeUpgradeMenuButton;
+
+	[Header("Pause Menu")]
+	public GameObject pauseMenuPanel;
+	public Button resumeButton;
+	public Button mainMenuButton;
+
+	private bool isPaused = false;
 
 	[Header("Money Multipliers")]
 	public float altitudeMultiplier = 0.1f;
@@ -61,6 +69,10 @@ public class GameManager : MonoBehaviour
 
 		openUpgradeMenuButton.onClick.AddListener(OpenUpgradeMenu);
 		closeUpgradeMenuButton.onClick.AddListener(CloseUpgradeMenu);
+
+		pauseMenuPanel.SetActive(false);
+		resumeButton.onClick.AddListener(ResumeGame);
+		mainMenuButton.onClick.AddListener(LoadMainMenu);
 	}
 
 	private void Update()
@@ -68,6 +80,11 @@ public class GameManager : MonoBehaviour
 		if (!rocketController.IsExploded)
 		{
 			UpdateFlightStats();
+		}
+
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			TogglePause();
 		}
 	}
 
@@ -179,5 +196,28 @@ public class GameManager : MonoBehaviour
 		totalMoneyEarned = 0f;
 		ResetFlightStats();
 		rocketController.ResetRocket(initialPosition);
+	}
+
+	private void TogglePause()
+	{
+		isPaused = !isPaused;
+		pauseMenuPanel.SetActive(isPaused);
+		Time.timeScale = isPaused ? 0f : 1f;
+
+		if (rocketController != null)
+		{
+			rocketController.enabled = !isPaused;
+		}
+	}
+
+	private void ResumeGame()
+	{
+		TogglePause();
+	}
+
+	private void LoadMainMenu()
+	{
+		Time.timeScale = 1f;
+		SceneManager.LoadScene("MainMenu");
 	}
 }
