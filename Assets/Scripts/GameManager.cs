@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
 	[Header("Pause Menu")]
 	public GameObject pauseMenuPanel;
 	public Button resumeButton;
-	public Button mainMenuButton;
+	public Button quitGameButton;
 
 	private bool isPaused = false;
 
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
 
 		pauseMenuPanel.SetActive(false);
 		resumeButton.onClick.AddListener(ResumeGame);
-		mainMenuButton.onClick.AddListener(LoadMainMenu);
+		quitGameButton.onClick.AddListener(QuitGame);
 	}
 
 	private void Update()
@@ -215,9 +215,12 @@ public class GameManager : MonoBehaviour
 		TogglePause();
 	}
 
-	private void LoadMainMenu()
+	private void QuitGame()
 	{
-		Time.timeScale = 1f;
-		SceneManager.LoadScene("MainMenu");
+		#if UNITY_EDITOR
+			UnityEditor.EditorApplication.isPlaying = false;
+		#else
+			Application.Quit();
+		#endif
 	}
 }
