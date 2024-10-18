@@ -116,4 +116,20 @@ public class UpgradeManager : MonoBehaviour
 			currentMoneyText.text = $"Current Money: ${gameManager.GetTotalMoneyEarned():F2}";
 		}
 	}
+
+	public void ResetUpgrades()
+	{
+		foreach (var upgrade in upgrades)
+		{
+			upgrade.currentTier = 0;
+			UpdateUpgradeText(upgrade);
+		}
+
+		rocketController.thrust = 2500f;
+		rocketController.maxFuel = 100f;
+		rocketController.rotationSpeed = 1000f;
+		rocketController.armor = 0f;
+
+		UpdateCurrentMoneyText();
+	}
 }

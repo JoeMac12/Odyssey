@@ -29,7 +29,13 @@ public class GameManager : MonoBehaviour
 	public Button resumeButton;
 	public Button quitGameButton;
 
+	[Header("Win Condition")]
+	public float winAltitude = 10000f;
+	public GameObject winPanel;
+	public Button resetGameButton;
+
 	private bool isPaused = false;
+	private bool hasWon = false;
 
 	[Header("Money Multipliers")]
 	public float altitudeMultiplier = 0.1f;
@@ -65,6 +71,7 @@ public class GameManager : MonoBehaviour
 		initialPosition = rocketController.transform.position;
 		performancePanel.SetActive(false);
 		upgradePanel.SetActive(false);
+		winPanel.SetActive(false);
 		ResetFlightStats();
 
 		openUpgradeMenuButton.onClick.AddListener(OpenUpgradeMenu);
@@ -73,13 +80,16 @@ public class GameManager : MonoBehaviour
 		pauseMenuPanel.SetActive(false);
 		resumeButton.onClick.AddListener(ResumeGame);
 		quitGameButton.onClick.AddListener(QuitGame);
+
+		resetGameButton.onClick.AddListener(ResetGame);
 	}
 
 	private void Update()
 	{
-		if (!rocketController.IsExploded)
+		if (!rocketController.IsExploded && !hasWon)
 		{
 			UpdateFlightStats();
+			CheckWinCondition();
 		}
 
 		if (Input.GetKeyDown(KeyCode.Escape))
@@ -99,9 +109,37 @@ public class GameManager : MonoBehaviour
 		distanceTravelled = Vector3.Distance(initialPosition, rocketController.transform.position) * metersToFeet;
 	}
 
+	private void CheckWinCondition()
+	{
+		if (maxAltitude >= winAltitude && !hasWon)
+		{
+			hasWon = true;
+			StartCoroutine(ShowWinPanel());
+		}
+	}
+
+	private IEnumerator ShowWinPanel()
+	{
+		winPanel.SetActive(true);
+		CanvasGroup canvasGroup = winPanel.GetComponent<CanvasGroup>();
+		canvasGroup.alpha = 0;
+
+		float elapsedTime = 0f;
+		while (elapsedTime < panelFadeDuration)
+		{
+			canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsedTime / panelFadeDuration);
+			elapsedTime += Time.deltaTime;
+			yield return null;
+		}
+		canvasGroup.alpha = 1f;
+	}
+
 	public void OnRocketExploded()
 	{
-		StartCoroutine(ShowPerformancePanel());
+		if (!hasWon)
+		{
+			StartCoroutine(ShowPerformancePanel());
+		}
 	}
 
 	private IEnumerator ShowPerformancePanel()
@@ -170,6 +208,7 @@ public class GameManager : MonoBehaviour
 		maxAltitude = 0f;
 		maxSpeed = 0f;
 		distanceTravelled = 0f;
+		hasWon = false;
 	}
 
 	public float GetTotalMoneyEarned()
@@ -190,12 +229,13 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	// This will be used to reset the whole game but we don't need that right now
 	public void ResetGame()
 	{
 		totalMoneyEarned = 0f;
 		ResetFlightStats();
 		rocketController.ResetRocket(initialPosition);
+		upgradeManager.ResetUpgrades();
+		winPanel.SetActive(false);
 	}
 
 	private void TogglePause()
