@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
 
 	[Header("Pause Menu")]
 	public Button resumeButton;
+	public Button mainMenuButton;
 	public Button quitGameButton;
 
 	[Header("Win Condition")]
@@ -65,6 +66,7 @@ public class GameManager : MonoBehaviour
 		openUpgradeMenuButton.onClick.AddListener(OpenUpgradeMenu);
 		closeUpgradeMenuButton.onClick.AddListener(CloseUpgradeMenu);
 		resumeButton.onClick.AddListener(ResumeGame);
+		mainMenuButton.onClick.AddListener(ReturnToMainMenu);
 		quitGameButton.onClick.AddListener(QuitGame);
 		resetGameButton.onClick.AddListener(ResetGame);
 	}
@@ -91,6 +93,12 @@ public class GameManager : MonoBehaviour
 		{
 			TogglePause();
 		}
+	}
+
+	private void ReturnToMainMenu()
+	{
+		Time.timeScale = 1f;
+		SceneManager.LoadScene("MainMenu");
 	}
 
 	private void UpdateFlightStats()
