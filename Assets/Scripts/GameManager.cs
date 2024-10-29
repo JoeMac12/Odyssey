@@ -7,8 +7,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-	public static GameManager Instance;
-
 	public RocketController rocketController;
 	public WindManager windManager;
 	public UpgradeManager upgradeManager;
@@ -57,25 +55,10 @@ public class GameManager : MonoBehaviour
 	private const float metersToFeet = 3.28084f;
 	private const float metersToMPH = 2.23694f;
 
-	private void Awake()
-	{
-		if (Instance == null)
-		{
-			Instance = this;
-			DontDestroyOnLoad(gameObject);
-		}
-		else
-		{
-			Destroy(gameObject);
-		}
-	}
-
 	private void Start()
 	{
 		initialPosition = rocketController.transform.position;
-
 		windManager.Initialize(rocketController);
-
 		SetUIState();
 		ResetFlightStats();
 

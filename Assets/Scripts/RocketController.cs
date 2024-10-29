@@ -6,6 +6,7 @@ using TMPro;
 
 public class RocketController : MonoBehaviour
 {
+	public GameManager gameManager;
 	public float thrust = 2500f;
 	public float rotationSpeed = 1000f;
 	public float maxVelocity = 9999f;
@@ -54,6 +55,12 @@ public class RocketController : MonoBehaviour
 		rb = GetComponent<Rigidbody>();
 		initialRotation = transform.rotation;
 		ResetRocket(transform.position);
+
+		if (gameManager == null)
+		{
+			enabled = false;
+			return;
+		}
 	}
 
 	void FixedUpdate()
@@ -246,13 +253,12 @@ public class RocketController : MonoBehaviour
 		isExploding = true;
 		IsExploded = true;
 
-		this.enabled = false;
-
 		//Instantiate(explosionPrefab, transform.position, Quaternion.identity);
 
+		this.enabled = false;
 		gameObject.SetActive(false);
 
-		GameManager.Instance.OnRocketExploded();
+		gameManager.OnRocketExploded();
 
 		yield return new WaitForSeconds(1f);
 
