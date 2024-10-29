@@ -18,6 +18,9 @@ public class RocketController : MonoBehaviour
 	public float currentHealth;
 	public float armor = 0f;
 
+	public TMP_Text healthText;
+	public TMP_Text armorText;
+
 	//public GameObject explosionPrefab;
 	public float explosionDelay = 3f;
 
@@ -216,6 +219,15 @@ public class RocketController : MonoBehaviour
 		Quaternion deltaRotation = Quaternion.Inverse(initialRotation) * transform.rotation;
 		float bankAngle = NormalizeAngle(deltaRotation.eulerAngles.z);
 		bankAngleText.text = "Bank Angle: " + bankAngle.ToString("F1") + "°";
+
+		if (healthText != null)
+		{
+			healthText.text = $"Health: <color=green>{currentHealth:F0}</color>/{maxHealth:F0}";
+		}
+		if (armorText != null)
+		{
+			armorText.text = $"Armor: {armor:F0}";
+		}
 	}
 
 	public void TakeDamage(float damage)
