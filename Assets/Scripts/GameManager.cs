@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 	public static GameManager Instance;
 
 	public RocketController rocketController;
+	public WindManager windManager;
 	public UpgradeManager upgradeManager;
 
 	[Header("UI Panels")]
@@ -72,6 +73,8 @@ public class GameManager : MonoBehaviour
 	private void Start()
 	{
 		initialPosition = rocketController.transform.position;
+
+		windManager.Initialize(rocketController);
 
 		SetUIState();
 		ResetFlightStats();
@@ -235,6 +238,7 @@ public class GameManager : MonoBehaviour
 		upgradePanel.SetActive(false);
 		rocketController.ResetRocket(initialPosition);
 		ResetFlightStats();
+		windManager.GenerateNewWind();
 
 		StartCoroutine(FadeInGameplayUI());
 	}
@@ -294,6 +298,8 @@ public class GameManager : MonoBehaviour
 		rocketController.ResetRocket(initialPosition);
 		upgradeManager.ResetUpgrades();
 		winPanel.SetActive(false);
+
+		windManager.GenerateNewWind();
 
 		StartCoroutine(FadeInGameplayUI());
 	}
