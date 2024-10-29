@@ -11,8 +11,14 @@ public class GameManager : MonoBehaviour
 
 	public RocketController rocketController;
 	public UpgradeManager upgradeManager;
+
+	[Header("UI Panels")]
+	public GameObject rocketUI;
+	public GameObject weatherUI;
 	public GameObject performancePanel;
 	public GameObject upgradePanel;
+	public GameObject pauseMenuPanel;
+	public GameObject winPanel;
 	public float panelFadeDuration = 1f;
 
 	[Header("Performance UI")]
@@ -25,13 +31,11 @@ public class GameManager : MonoBehaviour
 	public Button closeUpgradeMenuButton;
 
 	[Header("Pause Menu")]
-	public GameObject pauseMenuPanel;
 	public Button resumeButton;
 	public Button quitGameButton;
 
 	[Header("Win Condition")]
 	public float winAltitude = 10000f;
-	public GameObject winPanel;
 	public Button resetGameButton;
 
 	private bool isPaused = false;
@@ -49,7 +53,6 @@ public class GameManager : MonoBehaviour
 	private float distanceTravelled;
 	private float totalMoneyEarned = 0f;
 
-	// This should be right I think?
 	private const float metersToFeet = 3.28084f;
 	private const float metersToMPH = 2.23694f;
 
@@ -69,19 +72,25 @@ public class GameManager : MonoBehaviour
 	private void Start()
 	{
 		initialPosition = rocketController.transform.position;
-		performancePanel.SetActive(false);
-		upgradePanel.SetActive(false);
-		winPanel.SetActive(false);
+
+		SetUIState();
 		ResetFlightStats();
 
 		openUpgradeMenuButton.onClick.AddListener(OpenUpgradeMenu);
 		closeUpgradeMenuButton.onClick.AddListener(CloseUpgradeMenu);
-
-		pauseMenuPanel.SetActive(false);
 		resumeButton.onClick.AddListener(ResumeGame);
 		quitGameButton.onClick.AddListener(QuitGame);
-
 		resetGameButton.onClick.AddListener(ResetGame);
+	}
+
+	private void SetUIState()
+	{
+		rocketUI.SetActive(true);
+		weatherUI.SetActive(true);
+		performancePanel.SetActive(false);
+		upgradePanel.SetActive(false);
+		pauseMenuPanel.SetActive(false);
+		winPanel.SetActive(false);
 	}
 
 	private void Update()
@@ -136,10 +145,34 @@ public class GameManager : MonoBehaviour
 
 	public void OnRocketExploded()
 	{
+		StartCoroutine(FadeOutGameplayUI());
+
 		if (!hasWon)
 		{
 			StartCoroutine(ShowPerformancePanel());
 		}
+	}
+
+	private IEnumerator FadeOutGameplayUI()
+	{
+		CanvasGroup rocketUIGroup = rocketUI.GetComponent<CanvasGroup>();
+		if (rocketUIGroup == null) rocketUIGroup = rocketUI.AddComponent<CanvasGroup>();
+
+		CanvasGroup weatherUIGroup = weatherUI.GetComponent<CanvasGroup>();
+		if (weatherUIGroup == null) weatherUIGroup = weatherUI.AddComponent<CanvasGroup>();
+
+		float elapsedTime = 0f;
+		while (elapsedTime < panelFadeDuration)
+		{
+			float alpha = Mathf.Lerp(1f, 0f, elapsedTime / panelFadeDuration);
+			rocketUIGroup.alpha = alpha;
+			weatherUIGroup.alpha = alpha;
+			elapsedTime += Time.deltaTime;
+			yield return null;
+		}
+
+		rocketUI.SetActive(false);
+		weatherUI.SetActive(false);
 	}
 
 	private IEnumerator ShowPerformancePanel()
@@ -155,6 +188,7 @@ public class GameManager : MonoBehaviour
 
 	private IEnumerator FadeInPanel(CanvasGroup canvasGroup)
 	{
+		canvasGroup.alpha = 0f;
 		float elapsedTime = 0f;
 		while (elapsedTime < panelFadeDuration)
 		{
@@ -201,6 +235,30 @@ public class GameManager : MonoBehaviour
 		upgradePanel.SetActive(false);
 		rocketController.ResetRocket(initialPosition);
 		ResetFlightStats();
+
+		StartCoroutine(FadeInGameplayUI());
+	}
+
+	private IEnumerator FadeInGameplayUI()
+	{
+		rocketUI.SetActive(true);
+		weatherUI.SetActive(true);
+
+		CanvasGroup rocketUIGroup = rocketUI.GetComponent<CanvasGroup>();
+		CanvasGroup weatherUIGroup = weatherUI.GetComponent<CanvasGroup>();
+
+		float elapsedTime = 0f;
+		while (elapsedTime < panelFadeDuration)
+		{
+			float alpha = Mathf.Lerp(0f, 1f, elapsedTime / panelFadeDuration);
+			rocketUIGroup.alpha = alpha;
+			weatherUIGroup.alpha = alpha;
+			elapsedTime += Time.deltaTime;
+			yield return null;
+		}
+
+		rocketUIGroup.alpha = 1f;
+		weatherUIGroup.alpha = 1f;
 	}
 
 	private void ResetFlightStats()
@@ -236,6 +294,8 @@ public class GameManager : MonoBehaviour
 		rocketController.ResetRocket(initialPosition);
 		upgradeManager.ResetUpgrades();
 		winPanel.SetActive(false);
+
+		StartCoroutine(FadeInGameplayUI());
 	}
 
 	private void TogglePause()
