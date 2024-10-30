@@ -215,16 +215,16 @@ public class RocketController : MonoBehaviour
 	void UpdateUI()
 	{
 		float speedMPH = rb.velocity.magnitude * 2.237f;
-		speedText.text = "Speed: " + speedMPH.ToString("F1") + " MPH";
+		speedText.text = $"Speed: {speedMPH:F1} MPH";
 
 		float altitude = transform.position.y * 3.281f;
-		altitudeText.text = "Altitude: " + altitude.ToString("F1") + " ft";
+		altitudeText.text = $"Altitude: {altitude:F1} ft";
 
-		flightTimeText.text = "Flight Time: " + flightTime.ToString("F1") + " s";
+		flightTimeText.text = $"Flight Time: {flightTime:F1} s";
 
 		Quaternion deltaRotation = Quaternion.Inverse(initialRotation) * transform.rotation;
 		float bankAngle = NormalizeAngle(deltaRotation.eulerAngles.z);
-		bankAngleText.text = "Bank Angle: " + bankAngle.ToString("F1") + "°";
+		bankAngleText.text = $"Bank Angle: {bankAngle:F1}°";
 
 		if (healthText != null)
 		{
@@ -244,6 +244,14 @@ public class RocketController : MonoBehaviour
 		if (currentHealth <= 0 && !isExploding)
 		{
 			StartCoroutine(ExplodeRocket());
+		}
+	}
+
+	public void SelfDestruct()
+	{
+		if (hasLaunched && !IsExploded)
+		{
+			TakeDamage(currentHealth + armor);
 		}
 	}
 

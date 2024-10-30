@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
 	[Header("UI Panels")]
 	public GameObject rocketUI;
 	public GameObject weatherUI;
+	public GameObject rocketPanelUI;
 	public GameObject performancePanel;
 	public GameObject upgradePanel;
 	public GameObject pauseMenuPanel;
@@ -28,6 +29,7 @@ public class GameManager : MonoBehaviour
 	public TMP_Text moneyEarnedText;
 	public Button openUpgradeMenuButton;
 	public Button closeUpgradeMenuButton;
+	public Button selfDestructButton;
 
 	[Header("Pause Menu")]
 	public Button resumeButton;
@@ -69,12 +71,14 @@ public class GameManager : MonoBehaviour
 		mainMenuButton.onClick.AddListener(ReturnToMainMenu);
 		quitGameButton.onClick.AddListener(QuitGame);
 		resetGameButton.onClick.AddListener(ResetGame);
+		selfDestructButton.onClick.AddListener(SelfDestructRocket);
 	}
 
 	private void SetUIState()
 	{
 		rocketUI.SetActive(true);
 		weatherUI.SetActive(true);
+		rocketPanelUI.SetActive(true);
 		performancePanel.SetActive(false);
 		upgradePanel.SetActive(false);
 		pauseMenuPanel.SetActive(false);
@@ -147,6 +151,14 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
+	private void SelfDestructRocket()
+	{
+		if (rocketController != null && !rocketController.IsExploded)
+		{
+			rocketController.SelfDestruct();
+		}
+	}
+
 	private IEnumerator FadeOutGameplayUI()
 	{
 		CanvasGroup rocketUIGroup = rocketUI.GetComponent<CanvasGroup>();
@@ -155,18 +167,23 @@ public class GameManager : MonoBehaviour
 		CanvasGroup weatherUIGroup = weatherUI.GetComponent<CanvasGroup>();
 		if (weatherUIGroup == null) weatherUIGroup = weatherUI.AddComponent<CanvasGroup>();
 
+		CanvasGroup rocketPanelUIGroup = rocketPanelUI.GetComponent<CanvasGroup>();
+		if (rocketPanelUIGroup == null) rocketPanelUIGroup = rocketPanelUI.AddComponent<CanvasGroup>();
+
 		float elapsedTime = 0f;
 		while (elapsedTime < panelFadeDuration)
 		{
 			float alpha = Mathf.Lerp(1f, 0f, elapsedTime / panelFadeDuration);
 			rocketUIGroup.alpha = alpha;
 			weatherUIGroup.alpha = alpha;
+			rocketPanelUIGroup.alpha = alpha;
 			elapsedTime += Time.deltaTime;
 			yield return null;
 		}
 
 		rocketUI.SetActive(false);
 		weatherUI.SetActive(false);
+		rocketPanelUI.SetActive(false);
 	}
 
 	private IEnumerator ShowPerformancePanel()
@@ -238,9 +255,11 @@ public class GameManager : MonoBehaviour
 	{
 		rocketUI.SetActive(true);
 		weatherUI.SetActive(true);
+		rocketPanelUI.SetActive(true);
 
 		CanvasGroup rocketUIGroup = rocketUI.GetComponent<CanvasGroup>();
 		CanvasGroup weatherUIGroup = weatherUI.GetComponent<CanvasGroup>();
+		CanvasGroup rocketPanelUIGroup = rocketPanelUI.GetComponent<CanvasGroup>();
 
 		float elapsedTime = 0f;
 		while (elapsedTime < panelFadeDuration)
@@ -248,12 +267,14 @@ public class GameManager : MonoBehaviour
 			float alpha = Mathf.Lerp(0f, 1f, elapsedTime / panelFadeDuration);
 			rocketUIGroup.alpha = alpha;
 			weatherUIGroup.alpha = alpha;
+			rocketPanelUIGroup.alpha = alpha;
 			elapsedTime += Time.deltaTime;
 			yield return null;
 		}
 
 		rocketUIGroup.alpha = 1f;
 		weatherUIGroup.alpha = 1f;
+		rocketPanelUIGroup.alpha = 1f;
 	}
 
 	private void ResetFlightStats()
