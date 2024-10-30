@@ -62,6 +62,14 @@ public class RocketController : MonoBehaviour
 		}
 	}
 
+	void OnTriggerEnter(Collider other)
+	{
+		if (other.CompareTag("DeathTrigger") && !isExploding)
+		{
+			StartCoroutine(ExplodeRocket());
+		}
+	}
+
 	void FixedUpdate()
 	{
 		if (IsExploded) return;
