@@ -10,7 +10,6 @@ public class RocketController : MonoBehaviour
 	public float thrust = 2500f;
 	public float rotationSpeed = 1000f;
 	public float maxVelocity = 9999f;
-	public float maxTurnAngle = 30f;
 	public float maxFuel = 100f;
 	public float fuelRate = 10f;
 	public Image fuelBar;
@@ -141,15 +140,7 @@ public class RocketController : MonoBehaviour
 		deltaEulerAngles.y = NormalizeAngle(deltaEulerAngles.y);
 		deltaEulerAngles.z = NormalizeAngle(deltaEulerAngles.z);
 
-		if (Mathf.Abs(deltaEulerAngles.x) < maxTurnAngle || Mathf.Sign(rotation.x) != Mathf.Sign(deltaEulerAngles.x))
-		{
-			rb.AddRelativeTorque(rotation.x * rotationSpeed, 0f, 0f);
-		}
-
-		if (Mathf.Abs(deltaEulerAngles.z) < maxTurnAngle || Mathf.Sign(rotation.z) != Mathf.Sign(deltaEulerAngles.z))
-		{
-			rb.AddRelativeTorque(0f, 0f, rotation.z * rotationSpeed);
-		}
+		rb.AddRelativeTorque(rotation.x * rotationSpeed, 0f, rotation.z * rotationSpeed);
 
 		if (rotation.magnitude == 0f && IsThrusting && currentFuel > 0f)
 		{
