@@ -14,6 +14,8 @@ public class RocketController : MonoBehaviour
 	public float fuelRate = 10f;
 	public Image fuelBar;
 
+	public CameraController cameraController;
+
 	public float maxHealth = 100f;
 	public float currentHealth;
 	public float armor = 0f;
@@ -265,6 +267,11 @@ public class RocketController : MonoBehaviour
 		this.enabled = false;
 		gameObject.SetActive(false);
 
+		if (cameraController != null)
+		{
+			cameraController.controlsEnabled = false;
+		}
+
 		gameManager.OnRocketExploded();
 
 		yield return new WaitForSeconds(1f);
@@ -298,6 +305,11 @@ public class RocketController : MonoBehaviour
 		{
 			rocketLight.enabled = false;
 			thrustLightRunning = false;
+		}
+
+		if (cameraController != null)
+		{
+			cameraController.controlsEnabled = true;
 		}
 	}
 

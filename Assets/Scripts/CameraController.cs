@@ -14,6 +14,7 @@ public class CameraController : MonoBehaviour
 	public float maxYAngle = 80f;
 
 	public bool smoothZoom = false;
+	public bool controlsEnabled = true;
 	public float zoomSmoothSpeed = 10f;
 
 	private float currentX = 0f;
@@ -27,6 +28,8 @@ public class CameraController : MonoBehaviour
 
 	void Update()
 	{
+		if (!controlsEnabled) return;
+
 		float scrollInput = Input.GetAxis("Mouse ScrollWheel");
 		if (scrollInput != 0f)
 		{
