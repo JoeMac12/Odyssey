@@ -104,8 +104,17 @@ public class UpgradeManager : MonoBehaviour
 	{
 		if (upgrade.upgradeText != null)
 		{
-			float nextCost = CalculateUpgradeCost(upgrade);
-			upgrade.upgradeText.text = $"{upgrade.name} (Tier {upgrade.currentTier}/10)\nCost: ${nextCost:F2}";
+			if (upgrade.currentTier >= 10)
+			{
+				upgrade.upgradeText.text = $"{upgrade.name}\n<color=green>PATH COMPLETE!</color>";
+				upgrade.upgradeButton.interactable = false;
+			}
+			else
+			{
+				float nextCost = CalculateUpgradeCost(upgrade);
+				string costColor = gameManager.GetTotalMoneyEarned() >= nextCost ? "green" : "red";
+				upgrade.upgradeText.text = $"{upgrade.name} (Tier {upgrade.currentTier}/10)\nCost: <color={costColor}>${nextCost:F2}</color>";
+			}
 		}
 	}
 
@@ -115,6 +124,11 @@ public class UpgradeManager : MonoBehaviour
 		{
 			currentMoneyText.text = $"Current Money: ${gameManager.GetTotalMoneyEarned():F2}";
 		}
+
+		foreach (var upgrade in upgrades)
+		{
+			UpdateUpgradeText(upgrade);
+		}
 	}
 
 	public void ResetUpgrades()
@@ -122,6 +136,7 @@ public class UpgradeManager : MonoBehaviour
 		foreach (var upgrade in upgrades)
 		{
 			upgrade.currentTier = 0;
+			upgrade.upgradeButton.interactable = true;
 			UpdateUpgradeText(upgrade);
 		}
 
