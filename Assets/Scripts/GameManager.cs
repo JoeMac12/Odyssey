@@ -52,6 +52,9 @@ public class GameManager : MonoBehaviour
 	[Header("Effects")]
 	public BlurEffectManager blurManager;
 
+	[Header("Audio")]
+	public MusicManager musicManager;
+
 	private Vector3 initialPosition;
 	private float maxAltitude;
 	private float maxSpeed;
@@ -67,6 +70,11 @@ public class GameManager : MonoBehaviour
 		windManager.Initialize(rocketController);
 		SetUIState();
 		ResetFlightStats();
+
+		if (musicManager != null)
+		{
+			musicManager.StartGameplayMusic();
+		}
 
 		openUpgradeMenuButton.onClick.AddListener(OpenUpgradeMenu);
 		closeUpgradeMenuButton.onClick.AddListener(CloseUpgradeMenu);
@@ -156,6 +164,10 @@ public class GameManager : MonoBehaviour
 		if (!hasWon)
 		{
 			StartCoroutine(ShowPerformancePanel());
+			if (musicManager != null)
+			{
+				musicManager.StartInterfaceMusic();
+			}
 		}
 	}
 
@@ -259,6 +271,11 @@ public class GameManager : MonoBehaviour
 		if (blurManager != null)
 		{
 			blurManager.DisableBlur();
+		}
+
+		if (musicManager != null)
+		{
+			musicManager.StartGameplayMusic();
 		}
 
 		StartCoroutine(FadeInGameplayUI());
