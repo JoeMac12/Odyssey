@@ -49,6 +49,9 @@ public class GameManager : MonoBehaviour
 	public float timeMultiplier = 10f;
 	public float distanceMultiplier = 0.2f;
 
+	[Header("Effects")]
+	public BlurEffectManager blurManager;
+
 	private Vector3 initialPosition;
 	private float maxAltitude;
 	private float maxSpeed;
@@ -143,6 +146,11 @@ public class GameManager : MonoBehaviour
 
 	public void OnRocketExploded()
 	{
+		if (blurManager != null)
+		{
+			blurManager.EnableBlur();
+		}
+
 		StartCoroutine(FadeOutGameplayUI());
 
 		if (!hasWon)
@@ -247,6 +255,11 @@ public class GameManager : MonoBehaviour
 		rocketController.ResetRocket(initialPosition);
 		ResetFlightStats();
 		windManager.GenerateNewWind();
+
+		if (blurManager != null)
+		{
+			blurManager.DisableBlur();
+		}
 
 		StartCoroutine(FadeInGameplayUI());
 	}
