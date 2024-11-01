@@ -351,11 +351,18 @@ public class GameManager : MonoBehaviour
 	{
 		isPaused = !isPaused;
 		pauseMenuPanel.SetActive(isPaused);
+
 		if (isPaused)
 			uiSoundSystem.PlayMenuOpenSound();
 		else
 			uiSoundSystem.PlayMenuCloseSound();
+
 		Time.timeScale = isPaused ? 0f : 1f;
+
+		if (musicManager != null)
+		{
+			musicManager.AdjustMusicVolume(isPaused);
+		}
 
 		if (rocketController != null)
 		{
