@@ -7,8 +7,8 @@ using TMPro;
 public class RocketController : MonoBehaviour
 {
 	public GameManager gameManager;
-	public float thrust = 2500f;
-	public float rotationSpeed = 1000f;
+	public float thrust = 1250f;
+	public float rotationSpeed = 250f;
 	public float maxVelocity = 9999f;
 	public float maxFuel = 100f;
 	public float fuelRate = 10f;

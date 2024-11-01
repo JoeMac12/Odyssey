@@ -131,7 +131,7 @@ public class UpgradeManager : MonoBehaviour
 				description = "Increases thrust power.\nAllows you to reach higher altitudes faster.",
 				currentTier = 0,
 				basePrice = 100,
-				baseValue = 250,
+				baseValue = 500,
 				upgradeButton = engineUpgradeButton,
 				upgradeText = engineUpgradeText
 			},
@@ -140,7 +140,7 @@ public class UpgradeManager : MonoBehaviour
 				description = "Increases maximum fuel amount.\nAllows you to fly for much longer.",
 				currentTier = 0,
 				basePrice = 150,
-				baseValue = 10,
+				baseValue = 50,
 				upgradeButton = fuelTankUpgradeButton,
 				upgradeText = fuelTankUpgradeText
 			},
@@ -149,7 +149,7 @@ public class UpgradeManager : MonoBehaviour
 				description = "Improves steering speed.\nAllows you to control the ship better during flight.",
 				currentTier = 0,
 				basePrice = 200,
-				baseValue = 0.1f,
+				baseValue = 250,
 				upgradeButton = aerodynamicsUpgradeButton,
 				upgradeText = aerodynamicsUpgradeText
 			},
@@ -158,7 +158,7 @@ public class UpgradeManager : MonoBehaviour
 				description = "Increases armor protection.\nHelps you survive againts impacts and lighting strikes.",
 				currentTier = 0,
 				basePrice = 250,
-				baseValue = 10,
+				baseValue = 25,
 				upgradeButton = hullUpgradeButton,
 				upgradeText = hullUpgradeText
 			}
@@ -272,7 +272,7 @@ public class UpgradeManager : MonoBehaviour
 			case "Fuel Tanks":
 				return $"{rocketController.maxFuel:F0} fuel capacity";
 			case "Aerodynamics":
-				return $"{rocketController.rotationSpeed:F1} rotation speed";
+				return $"{rocketController.rotationSpeed:F0} rotation speed";
 			case "Hull":
 				return $"{rocketController.armor:F0} armor";
 			default:
@@ -291,7 +291,7 @@ public class UpgradeManager : MonoBehaviour
 			case "Fuel Tanks":
 				return $"{rocketController.maxFuel + upgrade.baseValue:F0} fuel capacity";
 			case "Aerodynamics":
-				return $"{rocketController.rotationSpeed + upgrade.baseValue:F1} rotation speed";
+				return $"{rocketController.rotationSpeed + upgrade.baseValue:F0} rotation speed";
 			case "Hull":
 				return $"{rocketController.armor + upgrade.baseValue:F0} armor";
 			default:
@@ -392,9 +392,9 @@ public class UpgradeManager : MonoBehaviour
 			UpdateRocketVisuals(upgrade);
 		}
 
-		rocketController.thrust = 2500f;
+		rocketController.thrust = 1250f;
 		rocketController.maxFuel = 100f;
-		rocketController.rotationSpeed = 1000f;
+		rocketController.rotationSpeed = 250f;
 		rocketController.armor = 0f;
 
 		UpdateCurrentMoneyText();
