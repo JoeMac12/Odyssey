@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
 	public WindManager windManager;
 	public UpgradeManager upgradeManager;
 
+	public CameraController cameraController;
+
 	[Header("UI Panels")]
 	public GameObject rocketUI;
 	public GameObject weatherUI;
@@ -353,9 +355,15 @@ public class GameManager : MonoBehaviour
 		pauseMenuPanel.SetActive(isPaused);
 
 		if (isPaused)
+		{
 			uiSoundSystem.PlayMenuOpenSound();
+			cameraController.controlsEnabled = false;
+		}
 		else
+		{
 			uiSoundSystem.PlayMenuCloseSound();
+			cameraController.controlsEnabled = true;
+		}
 
 		Time.timeScale = isPaused ? 0f : 1f;
 
