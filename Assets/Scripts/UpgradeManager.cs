@@ -8,6 +8,13 @@ using TMPro;
 public class UpgradeManager : MonoBehaviour
 {
 	[System.Serializable]
+	public class RocketPart
+	{
+		public string upgradeName;
+		public GameObject[] partObjects;
+	}
+
+	[System.Serializable]
 	public class Upgrade
 	{
 		public string name;
@@ -17,9 +24,12 @@ public class UpgradeManager : MonoBehaviour
 		public float baseValue;
 		public Button upgradeButton;
 		public TMP_Text upgradeText;
+		public int partsChangeThreshold = 2;
+
 	}
 
 	public List<Upgrade> upgrades;
+	public List<RocketPart> rocketParts;
 	public GameManager gameManager;
 	public RocketController rocketController;
 	public UISoundSystem uiSoundSystem;
@@ -52,6 +62,7 @@ public class UpgradeManager : MonoBehaviour
 	{
 		InitializeUpgrades();
 		SetupTooltips();
+		InitializeRocketParts();
 	}
 
 	private void Start()
@@ -62,6 +73,53 @@ public class UpgradeManager : MonoBehaviour
 			tooltipPanel.SetActive(false);
 		}
 		UpdateStatsDisplay();
+	}
+
+	private void InitializeRocketParts()
+	{
+		foreach (var rocketPart in rocketParts)
+		{
+			if (rocketPart.partObjects != null)
+			{
+				foreach (var partObject in rocketPart.partObjects)
+				{
+					if (partObject != null)
+					{
+						partObject.SetActive(false);
+					}
+				}
+			}
+		}
+
+		foreach (var upgrade in upgrades)
+		{
+			UpdateRocketVisuals(upgrade);
+		}
+	}
+
+	private void UpdateRocketVisuals(Upgrade upgrade)
+	{
+		var rocketPart = rocketParts.Find(part => part.upgradeName == upgrade.name);
+		if (rocketPart == null || rocketPart.partObjects == null) return;
+
+		int visiblePartIndex = upgrade.currentTier / upgrade.partsChangeThreshold;
+		visiblePartIndex = Mathf.Min(visiblePartIndex, rocketPart.partObjects.Length - 1);
+
+		foreach (var partObject in rocketPart.partObjects)
+		{
+			if (partObject != null)
+			{
+				partObject.SetActive(false);
+			}
+		}
+
+		if (upgrade.currentTier > 0 && visiblePartIndex >= 0 && visiblePartIndex < rocketPart.partObjects.Length)
+		{
+			if (rocketPart.partObjects[visiblePartIndex] != null)
+			{
+				rocketPart.partObjects[visiblePartIndex].SetActive(true);
+			}
+		}
 	}
 
 	private void InitializeUpgrades()
@@ -261,6 +319,7 @@ public class UpgradeManager : MonoBehaviour
 			UpdateUpgradeText(upgrade);
 			UpdateCurrentMoneyText();
 			UpdateStatsDisplay();
+			UpdateRocketVisuals(upgrade);
 		}
 		else
 		{
@@ -330,6 +389,7 @@ public class UpgradeManager : MonoBehaviour
 			upgrade.currentTier = 0;
 			upgrade.upgradeButton.interactable = true;
 			UpdateUpgradeText(upgrade);
+			UpdateRocketVisuals(upgrade);
 		}
 
 		rocketController.thrust = 2500f;
