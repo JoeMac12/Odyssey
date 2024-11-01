@@ -22,6 +22,7 @@ public class UpgradeManager : MonoBehaviour
 	public List<Upgrade> upgrades;
 	public GameManager gameManager;
 	public RocketController rocketController;
+	public UISoundSystem uiSoundSystem;
 
 	[Header("UI References")]
 	public Button engineUpgradeButton;
@@ -254,11 +255,16 @@ public class UpgradeManager : MonoBehaviour
 		if (gameManager.GetTotalMoneyEarned() >= cost && upgrade.currentTier < 10)
 		{
 			gameManager.SpendMoney(cost);
+			uiSoundSystem.PlayUpgradeSuccessSound();
 			upgrade.currentTier++;
 			ApplyUpgrade(upgrade);
 			UpdateUpgradeText(upgrade);
 			UpdateCurrentMoneyText();
 			UpdateStatsDisplay();
+		}
+		else
+		{
+			uiSoundSystem.PlayUpgradeFailSound();
 		}
 	}
 

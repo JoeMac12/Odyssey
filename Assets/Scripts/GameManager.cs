@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
 
 	[Header("Audio")]
 	public MusicManager musicManager;
+	public UISoundSystem uiSoundSystem;
 
 	private Vector3 initialPosition;
 	private float maxAltitude;
@@ -350,6 +351,10 @@ public class GameManager : MonoBehaviour
 	{
 		isPaused = !isPaused;
 		pauseMenuPanel.SetActive(isPaused);
+		if (isPaused)
+			uiSoundSystem.PlayMenuOpenSound();
+		else
+			uiSoundSystem.PlayMenuCloseSound();
 		Time.timeScale = isPaused ? 0f : 1f;
 
 		if (rocketController != null)
