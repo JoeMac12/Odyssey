@@ -25,7 +25,6 @@ public class UpgradeManager : MonoBehaviour
 		public Button upgradeButton;
 		public TMP_Text upgradeText;
 		public int partsChangeThreshold = 2;
-
 	}
 
 	public List<Upgrade> upgrades;
@@ -128,7 +127,9 @@ public class UpgradeManager : MonoBehaviour
 		{
 			new Upgrade {
 				name = "Engines",
-				description = "Increases thrust power.\nAllows you to reach higher altitudes faster.",
+				description = "Advanced propulsion systems that dramatically increase thrust power.\n\n" +
+							"Powerful engines are crucial for achieving higher altitudes and breaking through dense atmosphere. " +
+							"Each upgrade significantly boosts your vertical acceleration and maximum speed potential.",
 				currentTier = 0,
 				basePrice = 100,
 				baseValue = 500,
@@ -137,7 +138,9 @@ public class UpgradeManager : MonoBehaviour
 			},
 			new Upgrade {
 				name = "Fuel Tanks",
-				description = "Increases maximum fuel amount.\nAllows you to fly for much longer.",
+				description = "High-capacity fuel containment systems with improved efficiency.\n\n" +
+							"Larger fuel reserves allow for extended flight duration and greater altitude potential. " +
+							"Essential for reaching the highest points of the atmosphere without running dry.",
 				currentTier = 0,
 				basePrice = 150,
 				baseValue = 50,
@@ -146,7 +149,9 @@ public class UpgradeManager : MonoBehaviour
 			},
 			new Upgrade {
 				name = "Aerodynamics",
-				description = "Improves steering speed.\nAllows you to control the ship better during flight.",
+				description = "Enhanced control fin surfaces and stabilization systems.\n\n" +
+							"Better aerodynamics provide precise maneuvering in all conditions. " +
+							"Critical for maintaining stability during high-speed flight and countering strong winds at altitude.",
 				currentTier = 0,
 				basePrice = 200,
 				baseValue = 250,
@@ -155,7 +160,9 @@ public class UpgradeManager : MonoBehaviour
 			},
 			new Upgrade {
 				name = "Hull",
-				description = "Increases armor protection.\nHelps you survive againts impacts and lighting strikes.",
+				description = "Reinforced structural integrity with advanced materials.\n\n" +
+							"Strengthened hull plating increases survival chances against environmental hazards. " +
+							"Provides essential protection from impacts and lighting strikes.",
 				currentTier = 0,
 				basePrice = 250,
 				baseValue = 25,
@@ -208,6 +215,23 @@ public class UpgradeManager : MonoBehaviour
 		}
 	}
 
+	private void ShowTooltip(Upgrade upgrade)
+	{
+		if (tooltipPanel != null && tooltipText != null)
+		{
+			tooltipText.text = upgrade.description;
+			tooltipPanel.SetActive(true);
+		}
+	}
+
+	private void HideTooltip()
+	{
+		if (tooltipPanel != null)
+		{
+			tooltipPanel.SetActive(false);
+		}
+	}
+
 	private void UpdateStatsDisplay()
 	{
 		if (statsPanel == null) return;
@@ -243,68 +267,6 @@ public class UpgradeManager : MonoBehaviour
 	private Upgrade GetUpgradeByName(string name)
 	{
 		return upgrades.Find(u => u.name == name);
-	}
-
-	private void ShowTooltip(Upgrade upgrade)
-	{
-		if (tooltipPanel != null && tooltipText != null)
-		{
-			string currentValue = GetCurrentUpgradeValue(upgrade);
-			string nextValue = GetNextUpgradeValue(upgrade);
-
-			tooltipText.text = $"{upgrade.description}\n\nCurrent Value: {currentValue}";
-
-			if (upgrade.currentTier < 10)
-			{
-				tooltipText.text += $"\nNext Level: {nextValue}";
-			}
-
-			tooltipPanel.SetActive(true);
-		}
-	}
-
-	private string GetCurrentUpgradeValue(Upgrade upgrade)
-	{
-		switch (upgrade.name)
-		{
-			case "Engines":
-				return $"{rocketController.thrust:F0} thrust";
-			case "Fuel Tanks":
-				return $"{rocketController.maxFuel:F0} fuel capacity";
-			case "Aerodynamics":
-				return $"{rocketController.rotationSpeed:F0} rotation speed";
-			case "Hull":
-				return $"{rocketController.armor:F0} armor";
-			default:
-				return "N/A";
-		}
-	}
-
-	private string GetNextUpgradeValue(Upgrade upgrade)
-	{
-		if (upgrade.currentTier >= 10) return "MAX";
-
-		switch (upgrade.name)
-		{
-			case "Engines":
-				return $"{rocketController.thrust + upgrade.baseValue:F0} thrust";
-			case "Fuel Tanks":
-				return $"{rocketController.maxFuel + upgrade.baseValue:F0} fuel capacity";
-			case "Aerodynamics":
-				return $"{rocketController.rotationSpeed + upgrade.baseValue:F0} rotation speed";
-			case "Hull":
-				return $"{rocketController.armor + upgrade.baseValue:F0} armor";
-			default:
-				return "N/A";
-		}
-	}
-
-	private void HideTooltip()
-	{
-		if (tooltipPanel != null)
-		{
-			tooltipPanel.SetActive(false);
-		}
 	}
 
 	public void PurchaseUpgrade(Upgrade upgrade)
