@@ -10,20 +10,10 @@ public class GameManager : MonoBehaviour
 	public RocketController rocketController;
 	public WindManager windManager;
 	public UpgradeManager upgradeManager;
-
 	public CameraController cameraController;
+	public UIStateManager uiStateManager;
 
-	[Header("UI Panels")]
-	public GameObject rocketUI;
-	public GameObject weatherUI;
-	public GameObject rocketPanelUI;
-	public GameObject performancePanel;
-	public GameObject upgradePanel;
-	public GameObject pauseMenuPanel;
-	public GameObject winPanel;
-	public float panelFadeDuration = 1f;
-
-	[Header("Performance UI")]
+	[Header("UI Elements")]
 	public TMP_Text maxAltitudeText;
 	public TMP_Text maxSpeedText;
 	public TMP_Text flightTimeText;
@@ -39,11 +29,8 @@ public class GameManager : MonoBehaviour
 	public Button quitGameButton;
 
 	[Header("Win Condition")]
-	public float winAltitude = 10000f;
+	public float winAltitude = 100000f;
 	public Button resetGameButton;
-
-	private bool isPaused = false;
-	private bool hasWon = false;
 
 	[Header("Money Multipliers")]
 	public float altitudeMultiplier = 0.1f;
@@ -63,6 +50,8 @@ public class GameManager : MonoBehaviour
 	private float maxSpeed;
 	private float distanceTravelled;
 	private float totalMoneyEarned = 0f;
+	private bool isPaused = false;
+	private bool hasWon = false;
 
 	private const float metersToFeet = 3.28084f;
 	private const float metersToMPH = 2.23694f;
@@ -79,6 +68,11 @@ public class GameManager : MonoBehaviour
 			musicManager.StartGameplayMusic();
 		}
 
+		SetupButtonListeners();
+	}
+
+	private void SetupButtonListeners()
+	{
 		openUpgradeMenuButton.onClick.AddListener(OpenUpgradeMenu);
 		closeUpgradeMenuButton.onClick.AddListener(CloseUpgradeMenu);
 		resumeButton.onClick.AddListener(ResumeGame);
@@ -90,13 +84,7 @@ public class GameManager : MonoBehaviour
 
 	private void SetUIState()
 	{
-		rocketUI.SetActive(true);
-		weatherUI.SetActive(true);
-		rocketPanelUI.SetActive(true);
-		performancePanel.SetActive(false);
-		upgradePanel.SetActive(false);
-		pauseMenuPanel.SetActive(false);
-		winPanel.SetActive(false);
+		uiStateManager.Initialize();
 	}
 
 	private void Update()
@@ -141,18 +129,8 @@ public class GameManager : MonoBehaviour
 
 	private IEnumerator ShowWinPanel()
 	{
-		winPanel.SetActive(true);
-		CanvasGroup canvasGroup = winPanel.GetComponent<CanvasGroup>();
-		canvasGroup.alpha = 0;
-
-		float elapsedTime = 0f;
-		while (elapsedTime < panelFadeDuration)
-		{
-			canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsedTime / panelFadeDuration);
-			elapsedTime += Time.deltaTime;
-			yield return null;
-		}
-		canvasGroup.alpha = 1f;
+		uiStateManager.SetState(UIStateManager.UIState.WinUI);
+		yield return null;
 	}
 
 	public void OnRocketExploded()
@@ -162,15 +140,14 @@ public class GameManager : MonoBehaviour
 			blurManager.EnableBlur();
 		}
 
-		StartCoroutine(FadeOutGameplayUI());
-
 		if (!hasWon)
 		{
-			StartCoroutine(ShowPerformancePanel());
+			uiStateManager.SetState(UIStateManager.UIState.FlightPerformanceUI);
 			if (musicManager != null)
 			{
 				musicManager.StartInterfaceMusic();
 			}
+			UpdatePerformanceUI();
 		}
 	}
 
@@ -180,57 +157,6 @@ public class GameManager : MonoBehaviour
 		{
 			rocketController.SelfDestruct();
 		}
-	}
-
-	private IEnumerator FadeOutGameplayUI()
-	{
-		CanvasGroup rocketUIGroup = rocketUI.GetComponent<CanvasGroup>();
-		if (rocketUIGroup == null) rocketUIGroup = rocketUI.AddComponent<CanvasGroup>();
-
-		CanvasGroup weatherUIGroup = weatherUI.GetComponent<CanvasGroup>();
-		if (weatherUIGroup == null) weatherUIGroup = weatherUI.AddComponent<CanvasGroup>();
-
-		CanvasGroup rocketPanelUIGroup = rocketPanelUI.GetComponent<CanvasGroup>();
-		if (rocketPanelUIGroup == null) rocketPanelUIGroup = rocketPanelUI.AddComponent<CanvasGroup>();
-
-		float elapsedTime = 0f;
-		while (elapsedTime < panelFadeDuration)
-		{
-			float alpha = Mathf.Lerp(1f, 0f, elapsedTime / panelFadeDuration);
-			rocketUIGroup.alpha = alpha;
-			weatherUIGroup.alpha = alpha;
-			rocketPanelUIGroup.alpha = alpha;
-			elapsedTime += Time.deltaTime;
-			yield return null;
-		}
-
-		rocketUI.SetActive(false);
-		weatherUI.SetActive(false);
-		rocketPanelUI.SetActive(false);
-	}
-
-	private IEnumerator ShowPerformancePanel()
-	{
-		yield return new WaitForSeconds(0f);
-
-		performancePanel.SetActive(true);
-		CanvasGroup canvasGroup = performancePanel.GetComponent<CanvasGroup>();
-		StartCoroutine(FadeInPanel(canvasGroup));
-
-		UpdatePerformanceUI();
-	}
-
-	private IEnumerator FadeInPanel(CanvasGroup canvasGroup)
-	{
-		canvasGroup.alpha = 0f;
-		float elapsedTime = 0f;
-		while (elapsedTime < panelFadeDuration)
-		{
-			canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsedTime / panelFadeDuration);
-			elapsedTime += Time.deltaTime;
-			yield return null;
-		}
-		canvasGroup.alpha = 1f;
 	}
 
 	private void UpdatePerformanceUI()
@@ -259,14 +185,13 @@ public class GameManager : MonoBehaviour
 
 	public void OpenUpgradeMenu()
 	{
-		performancePanel.SetActive(false);
-		upgradePanel.SetActive(true);
+		uiStateManager.SetState(UIStateManager.UIState.UpgradeUI);
 		upgradeManager.UpdateCurrentMoneyText();
 	}
 
 	public void CloseUpgradeMenu()
 	{
-		upgradePanel.SetActive(false);
+		uiStateManager.SetState(UIStateManager.UIState.GameplayUI);
 		rocketController.ResetRocket(initialPosition);
 		ResetFlightStats();
 		windManager.GenerateNewWind();
@@ -280,34 +205,6 @@ public class GameManager : MonoBehaviour
 		{
 			musicManager.StartGameplayMusic();
 		}
-
-		StartCoroutine(FadeInGameplayUI());
-	}
-
-	private IEnumerator FadeInGameplayUI()
-	{
-		rocketUI.SetActive(true);
-		weatherUI.SetActive(true);
-		rocketPanelUI.SetActive(true);
-
-		CanvasGroup rocketUIGroup = rocketUI.GetComponent<CanvasGroup>();
-		CanvasGroup weatherUIGroup = weatherUI.GetComponent<CanvasGroup>();
-		CanvasGroup rocketPanelUIGroup = rocketPanelUI.GetComponent<CanvasGroup>();
-
-		float elapsedTime = 0f;
-		while (elapsedTime < panelFadeDuration)
-		{
-			float alpha = Mathf.Lerp(0f, 1f, elapsedTime / panelFadeDuration);
-			rocketUIGroup.alpha = alpha;
-			weatherUIGroup.alpha = alpha;
-			rocketPanelUIGroup.alpha = alpha;
-			elapsedTime += Time.deltaTime;
-			yield return null;
-		}
-
-		rocketUIGroup.alpha = 1f;
-		weatherUIGroup.alpha = 1f;
-		rocketPanelUIGroup.alpha = 1f;
 	}
 
 	private void ResetFlightStats()
@@ -342,27 +239,26 @@ public class GameManager : MonoBehaviour
 		ResetFlightStats();
 		rocketController.ResetRocket(initialPosition);
 		upgradeManager.ResetUpgrades();
-		winPanel.SetActive(false);
 
+		uiStateManager.SetState(UIStateManager.UIState.GameplayUI);
 		windManager.GenerateNewWind();
-
-		StartCoroutine(FadeInGameplayUI());
 	}
 
 	private void TogglePause()
 	{
 		isPaused = !isPaused;
-		pauseMenuPanel.SetActive(isPaused);
 
 		if (isPaused)
 		{
 			uiSoundSystem.PlayMenuOpenSound();
 			cameraController.controlsEnabled = false;
+			uiStateManager.SetState(UIStateManager.UIState.PauseUI);
 		}
 		else
 		{
 			uiSoundSystem.PlayMenuCloseSound();
 			cameraController.controlsEnabled = true;
+			uiStateManager.ReturnFromPause();
 		}
 
 		Time.timeScale = isPaused ? 0f : 1f;
