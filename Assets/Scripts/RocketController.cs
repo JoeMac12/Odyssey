@@ -23,6 +23,10 @@ public class RocketController : MonoBehaviour
 	public TMP_Text healthText;
 	public TMP_Text armorText;
 
+	[Header("Sound Effects")]
+	public AudioSource explosionSound;
+	public float explosionVolume = 1f;
+
 	//public GameObject explosionPrefab;
 	public float explosionDelay = 3f;
 
@@ -61,6 +65,13 @@ public class RocketController : MonoBehaviour
 		{
 			enabled = false;
 			return;
+		}
+
+		if (explosionSound == null)
+		{
+			explosionSound = gameObject.AddComponent<AudioSource>();
+			explosionSound.playOnAwake = false;
+			explosionSound.volume = explosionVolume;
 		}
 	}
 
@@ -263,6 +274,21 @@ public class RocketController : MonoBehaviour
 		IsExploded = true;
 
 		//Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+
+		if (explosionSound != null)
+		{
+			GameObject soundObject = new GameObject("ExplosionSound");
+			soundObject.transform.position = transform.position;
+			AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
+			tempAudioSource.clip = explosionSound.clip;
+			tempAudioSource.volume = explosionSound.volume;
+			tempAudioSource.spatialBlend = 1f;
+			tempAudioSource.minDistance = 5f;
+			tempAudioSource.maxDistance = 100f;
+			tempAudioSource.Play();
+
+			Destroy(soundObject, tempAudioSource.clip.length + 0.1f);
+		}
 
 		this.enabled = false;
 		gameObject.SetActive(false);
