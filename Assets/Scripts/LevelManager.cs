@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour
 {
 	public static LevelManager Instance;
 	public GameObject loadingScreen;
+	public GameObject mainMenuUI;
 	public Image loadingBar;
 	public TMP_Text loadingText;
 	public float fadeDuration = 1f;
@@ -29,6 +30,31 @@ public class LevelManager : MonoBehaviour
 	void Start()
 	{
 		loadingScreen.SetActive(false);
+		UpdateMainMenu();
+	}
+
+	void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+	{
+		UpdateMainMenu();
+	}
+
+	void OnEnable()
+	{
+		SceneManager.sceneLoaded += OnSceneLoaded;
+	}
+
+	void OnDisable()
+	{
+		SceneManager.sceneLoaded -= OnSceneLoaded;
+	}
+
+	private void UpdateMainMenu()
+	{
+		if (mainMenuUI != null)
+		{
+			bool isMainMenu = SceneManager.GetActiveScene().name == "MainMenu";
+			mainMenuUI.SetActive(isMainMenu);
+		}
 	}
 
 	public void PlayGame()
