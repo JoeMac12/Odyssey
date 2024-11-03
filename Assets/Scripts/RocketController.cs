@@ -18,7 +18,8 @@ public class RocketController : MonoBehaviour
 
 	public float maxHealth = 100f;
 	public float currentHealth;
-	public float armor = 0f;
+	[Range(0f, 100f)]
+	public float armorPercentage = 0f;
 
 	public TMP_Text healthText;
 	public TMP_Text armorText;
@@ -99,15 +100,15 @@ public class RocketController : MonoBehaviour
 			if (damageSpeed > minDamageSpeed)
 			{
 				float overSpeed = damageSpeed - minDamageSpeed;
-				float damage = overSpeed * damageMultiplier;
+				float baseDamage = overSpeed * damageMultiplier;
 
 				float impactForce = collision.impulse.magnitude;
+				baseDamage *= (impactForce * 0.1f);
 
-				damage *= (impactForce * 0.1f);
+				float damageReduction = armorPercentage / 100f;
+				float finalDamage = baseDamage * (1f - damageReduction);
 
-				TakeDamage(damage);
-
-				Debug.Log($"Damage taken: {damage} at speed: {damageSpeed} MPH");
+				TakeDamage(finalDamage);
 			}
 		}
 	}
@@ -287,14 +288,13 @@ public class RocketController : MonoBehaviour
 		}
 		if (armorText != null)
 		{
-			armorText.text = $"Armor: {armor:F0}";
+			armorText.text = $"Damage Reduction: {armorPercentage:F0}%";
 		}
 	}
 
 	public void TakeDamage(float damage)
 	{
-		float damageAfterArmor = Mathf.Max(0, damage - armor);
-		currentHealth -= damageAfterArmor;
+		currentHealth -= damage;
 
 		if (currentHealth <= 0 && !isExploding)
 		{
@@ -306,7 +306,7 @@ public class RocketController : MonoBehaviour
 	{
 		if (hasLaunched && !IsExploded)
 		{
-			TakeDamage(currentHealth + armor);
+			TakeDamage(currentHealth);
 		}
 	}
 

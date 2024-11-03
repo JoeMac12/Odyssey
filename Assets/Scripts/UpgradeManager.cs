@@ -22,6 +22,7 @@ public class UpgradeManager : MonoBehaviour
 		public int currentTier;
 		public float basePrice;
 		public float baseValue;
+		public float basePercentage;
 		public Button upgradeButton;
 		public TMP_Text upgradeText;
 		public int partsChangeThreshold = 2;
@@ -161,11 +162,12 @@ public class UpgradeManager : MonoBehaviour
 			new Upgrade {
 				name = "Hull",
 				description = "Reinforced structural integrity with advanced materials.\n\n" +
-							"Strengthened hull plating increases survival chances against environmental hazards. " +
-							"Provides essential protection from impacts and lighting strikes.",
+							"Strengthened hull plating reduces incoming damage. " +
+							"Each upgrade increases your damage resistance, making you more resilient to all types of impacts and weather.",
 				currentTier = 0,
 				basePrice = 250,
-				baseValue = 25,
+				baseValue = 0,
+				basePercentage = 5f,
 				upgradeButton = hullUpgradeButton,
 				upgradeText = hullUpgradeText
 			}
@@ -245,8 +247,9 @@ public class UpgradeManager : MonoBehaviour
 		string rotationLine = FormatStatLine("Rotation Speed", rocketController.rotationSpeed,
 			currentlyHoveredUpgrade == "Aerodynamics" ? GetUpgradeByName("Aerodynamics").baseValue : 0);
 
-		string armorLine = FormatStatLine("Armor", rocketController.armor,
-			currentlyHoveredUpgrade == "Hull" ? GetUpgradeByName("Hull").baseValue : 0);
+		string armorLine = FormatStatLine("Damage Reduction", rocketController.armorPercentage,
+			currentlyHoveredUpgrade == "Hull" ? GetUpgradeByName("Hull").basePercentage : 0,
+			true);
 
 		if (thrustStatsText != null) thrustStatsText.text = thrustLine;
 		if (fuelStatsText != null) fuelStatsText.text = fuelLine;
@@ -254,14 +257,15 @@ public class UpgradeManager : MonoBehaviour
 		if (armorStatsText != null) armorStatsText.text = armorLine;
 	}
 
-	private string FormatStatLine(string statName, float currentValue, float increase)
+	private string FormatStatLine(string statName, float currentValue, float increase, bool isPercentage = false)
 	{
 		if (increase > 0)
 		{
 			float newValue = currentValue + increase;
-			return $"{statName}: \n{currentValue:F1} <color=green>-> {newValue:F1}</color>";
+			string format = isPercentage ? "{0:F1}%" : "{0:F1}";
+			return $"{statName}: \n{string.Format(format, currentValue)} <color=green>-> {string.Format(format, newValue)}</color>";
 		}
-		return $"{statName}: {currentValue:F1}";
+		return $"{statName}: {(isPercentage ? $"{currentValue:F1}%" : $"{currentValue:F1}")}";
 	}
 
 	private Upgrade GetUpgradeByName(string name)
@@ -308,7 +312,7 @@ public class UpgradeManager : MonoBehaviour
 				rocketController.rotationSpeed += upgrade.baseValue;
 				break;
 			case "Hull":
-				rocketController.armor += upgrade.baseValue;
+				rocketController.armorPercentage += upgrade.basePercentage;
 				break;
 		}
 	}
@@ -357,7 +361,7 @@ public class UpgradeManager : MonoBehaviour
 		rocketController.thrust = 1250f;
 		rocketController.maxFuel = 100f;
 		rocketController.rotationSpeed = 250f;
-		rocketController.armor = 0f;
+		rocketController.armorPercentage = 0f;
 
 		UpdateCurrentMoneyText();
 		UpdateStatsDisplay();
