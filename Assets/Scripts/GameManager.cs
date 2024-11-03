@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
 			CheckWinCondition();
 		}
 
-		if (Input.GetKeyDown(KeyCode.Escape))
+		if (Input.GetKeyDown(KeyCode.Escape) && uiStateManager.GetCurrentState() != UIStateManager.UIState.OptionsUI)
 		{
 			TogglePause();
 		}
