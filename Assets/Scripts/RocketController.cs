@@ -40,6 +40,11 @@ public class RocketController : MonoBehaviour
 	public float minIntensity = 8f;
 	public float maxIntensity = 10f;
 
+	[Header("Collision Settings")]
+	public float minDamageSpeed = 25f;
+	public float damageMultiplier = 1f;
+	public float speedMemoryTime = 0.25f;
+
 	[HideInInspector]
 	public Rigidbody rb;
 
@@ -50,6 +55,8 @@ public class RocketController : MonoBehaviour
 	private bool hasLaunched = false;
 	private float flightTime;
 	private bool thrustLightRunning = false;
+	private float highestRecentSpeed = 0f;
+	private float lastSpeedUpdateTime = 0f;
 
 	public bool IsThrusting { get; private set; }
 	public bool IsExploded { get; private set; }
@@ -83,9 +90,44 @@ public class RocketController : MonoBehaviour
 		}
 	}
 
+	void OnCollisionEnter(Collision collision)
+	{
+		if (collision.gameObject.CompareTag("GameObject") && !IsExploded)
+		{
+			float damageSpeed = Mathf.Max(highestRecentSpeed, rb.velocity.magnitude * 2.237f);
+
+			if (damageSpeed > minDamageSpeed)
+			{
+				float overSpeed = damageSpeed - minDamageSpeed;
+				float damage = overSpeed * damageMultiplier;
+
+				float impactForce = collision.impulse.magnitude;
+
+				damage *= (impactForce * 0.1f);
+
+				TakeDamage(damage);
+
+				Debug.Log($"Damage taken: {damage} at speed: {damageSpeed} MPH");
+			}
+		}
+	}
+
 	void FixedUpdate()
 	{
 		if (IsExploded) return;
+
+		float currentSpeedMPH = rb.velocity.magnitude * 2.237f;
+
+		if (Time.time - lastSpeedUpdateTime > speedMemoryTime)
+		{
+			highestRecentSpeed = currentSpeedMPH;
+			lastSpeedUpdateTime = Time.time;
+		}
+		else if (currentSpeedMPH > highestRecentSpeed)
+		{
+			highestRecentSpeed = currentSpeedMPH;
+			lastSpeedUpdateTime = Time.time;
+		}
 
 		IsThrusting = Input.GetKey(KeyCode.Space) && currentFuel > 0f;
 
@@ -317,6 +359,8 @@ public class RocketController : MonoBehaviour
 		IsExploded = false;
 		hasLaunched = false;
 		flightTime = 0f;
+		highestRecentSpeed = 0f;
+		lastSpeedUpdateTime = 0f;
 		this.enabled = true;
 		gameObject.SetActive(true);
 		rb.isKinematic = false;
