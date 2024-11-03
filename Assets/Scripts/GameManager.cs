@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour
 		}
 
 		SetupButtonListeners();
+		UpdateRocketControlState();
 	}
 
 	private void SetupButtonListeners()
@@ -85,6 +86,31 @@ public class GameManager : MonoBehaviour
 	private void SetUIState()
 	{
 		uiStateManager.Initialize();
+		uiStateManager.OnStateChanged += UpdateRocketControlState;
+	}
+
+	private void OnDestroy()
+	{
+		if (uiStateManager != null)
+		{
+			uiStateManager.OnStateChanged -= UpdateRocketControlState;
+		}
+	}
+
+	private void UpdateRocketControlState()
+	{
+		UIStateManager.UIState currentState = uiStateManager.GetCurrentState();
+		bool shouldEnableControls = currentState == UIStateManager.UIState.GameplayUI;
+
+		if (rocketController != null)
+		{
+			rocketController.enabled = shouldEnableControls && !isPaused;
+		}
+
+		if (cameraController != null)
+		{
+			cameraController.controlsEnabled = shouldEnableControls && !isPaused;
+		}
 	}
 
 	private void Update()

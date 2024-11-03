@@ -43,6 +43,9 @@ public class UIStateManager : MonoBehaviour
 	private UIState previousState;
 	private Dictionary<UIState, GameObject[]> stateToUI;
 
+	public delegate void StateChangeHandler();
+	public event StateChangeHandler OnStateChanged;
+
 	public void Initialize()
 	{
 		SetupButtonListeners();
@@ -120,6 +123,7 @@ public class UIStateManager : MonoBehaviour
 		CanvasGroup pauseGroup = pauseMenuPanel.GetComponent<CanvasGroup>();
 		yield return StartCoroutine(FadeInPanel(pauseGroup));
 		currentState = UIState.PauseUI;
+		OnStateChanged?.Invoke();
 	}
 
 	private IEnumerator TransitionFromPause()
@@ -141,6 +145,7 @@ public class UIStateManager : MonoBehaviour
 		}
 
 		currentState = previousState;
+		OnStateChanged?.Invoke();
 	}
 
 	private IEnumerator ShowOptionsMenu()
@@ -152,6 +157,7 @@ public class UIStateManager : MonoBehaviour
 		CanvasGroup optionsGroup = optionsPanel.GetComponent<CanvasGroup>();
 		yield return StartCoroutine(FadeInPanel(optionsGroup));
 		currentState = UIState.OptionsUI;
+		OnStateChanged?.Invoke();
 	}
 
 	private IEnumerator HideOptionsMenu()
@@ -183,6 +189,7 @@ public class UIStateManager : MonoBehaviour
 		}
 
 		currentState = newState;
+		OnStateChanged?.Invoke();
 	}
 
 	private void DisableAllUI()
