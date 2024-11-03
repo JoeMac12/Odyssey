@@ -14,6 +14,11 @@ public class LevelManager : MonoBehaviour
 	public TMP_Text loadingText;
 	public float fadeDuration = 1f;
 
+	[Header("Credits")]
+	public GameObject creditsUI;
+	public Button creditsButton;
+	public Button closeCreditsButton;
+
 	void Awake()
 	{
 		if (Instance == null)
@@ -31,6 +36,43 @@ public class LevelManager : MonoBehaviour
 	{
 		loadingScreen.SetActive(false);
 		UpdateMainMenu();
+		SetupCreditsButtons();
+	}
+
+	void SetupCreditsButtons()
+	{
+		if (creditsButton != null)
+		{
+			creditsButton.onClick.AddListener(ShowCredits);
+		}
+
+		if (closeCreditsButton != null)
+		{
+			closeCreditsButton.onClick.AddListener(HideCredits);
+		}
+
+		if (creditsUI != null)
+		{
+			creditsUI.SetActive(false);
+		}
+	}
+
+	void ShowCredits()
+	{
+		if (creditsUI != null)
+		{
+			creditsUI.SetActive(true);
+			mainMenuUI.SetActive(false);
+		}
+	}
+
+	void HideCredits()
+	{
+		if (creditsUI != null)
+		{
+			creditsUI.SetActive(false);
+			mainMenuUI.SetActive(true);
+		}
 	}
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -54,6 +96,10 @@ public class LevelManager : MonoBehaviour
 		{
 			bool isMainMenu = SceneManager.GetActiveScene().name == "MainMenu";
 			mainMenuUI.SetActive(isMainMenu);
+			if (creditsUI != null)
+			{
+				creditsUI.SetActive(false);
+			}
 		}
 	}
 
