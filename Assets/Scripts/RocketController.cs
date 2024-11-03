@@ -28,7 +28,7 @@ public class RocketController : MonoBehaviour
 	public AudioSource explosionSound;
 	public float explosionVolume = 1f;
 
-	//public GameObject explosionPrefab;
+	public GameObject explosionPrefab;
 	public float explosionDelay = 3f;
 
 	public TMP_Text speedText;
@@ -315,7 +315,8 @@ public class RocketController : MonoBehaviour
 		isExploding = true;
 		IsExploded = true;
 
-		//Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+		GameObject explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+		Destroy(explosion, 1f);
 
 		if (explosionSound != null)
 		{
