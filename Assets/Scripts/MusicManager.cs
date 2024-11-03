@@ -29,6 +29,7 @@ public class MusicManager : MonoBehaviour
 	private float targetGameplayVolume = 0f;
 	private float targetInterfaceVolume = 0f;
 	private Coroutine volTime;
+	private float masterMusicVolume = 1f;
 
 	private void Awake()
 	{
@@ -89,6 +90,24 @@ public class MusicManager : MonoBehaviour
 		StartCoroutine(CrossFade(gameplaySource, interfaceSource));
 	}
 
+	public void SetMasterMusicVolume(float volume)
+	{
+		masterMusicVolume = Mathf.Clamp01(volume);
+		UpdateSourceVolumes();
+	}
+
+	private void UpdateSourceVolumes()
+	{
+		if (gameplaySource != null)
+		{
+			gameplaySource.volume = targetGameplayVolume * masterMusicVolume;
+		}
+		if (interfaceSource != null)
+		{
+			interfaceSource.volume = targetInterfaceVolume * masterMusicVolume;
+		}
+	}
+
 	public void AdjustMusicVolume(bool isPaused)
 	{
 		if (volTime != null)
@@ -104,8 +123,8 @@ public class MusicManager : MonoBehaviour
 		float startInterfaceVolume = interfaceSource.volume;
 
 		float targetMultiplier = isPaused ? pauseMulti : 1f;
-		float targetGameplay = targetGameplayVolume * targetMultiplier;
-		float targetInterface = targetInterfaceVolume * targetMultiplier;
+		float targetGameplay = targetGameplayVolume * targetMultiplier * masterMusicVolume;
+		float targetInterface = targetInterfaceVolume * targetMultiplier * masterMusicVolume;
 
 		float elapsed = 0f;
 		float duration = 0.25f;
@@ -131,7 +150,7 @@ public class MusicManager : MonoBehaviour
 		float startTime = Time.time;
 		float initialFadeOutVolume = fadeOutSource.volume;
 		float initialFadeInVolume = fadeInSource.volume;
-		float targetVolume = maxVolume * (fadeInSource == gameplaySource ? gameplayMusic.volume : interfaceMusic.volume);
+		float targetVolume = maxVolume * (fadeInSource == gameplaySource ? gameplayMusic.volume : interfaceMusic.volume) * masterMusicVolume;
 
 		if (fadeInSource == gameplaySource)
 		{
@@ -183,5 +202,10 @@ public class MusicManager : MonoBehaviour
 		gameplaySource.Stop();
 		interfaceSource.Stop();
 		isFading = false;
+	}
+
+	public float GetMasterMusicVolume()
+	{
+		return masterMusicVolume;
 	}
 }

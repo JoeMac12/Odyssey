@@ -36,6 +36,11 @@ public class UIStateManager : MonoBehaviour
 	public Button optionsButton;
 	public Button backToPauseButton;
 
+	[Header("Options Settings")]
+	public Slider musicVolumeSlider;
+	public TMP_Text musicVolumeText;
+	public MusicManager musicManager;
+
 	[Header("Settings")]
 	public float panelFadeDuration = 1f;
 
@@ -49,6 +54,7 @@ public class UIStateManager : MonoBehaviour
 	public void Initialize()
 	{
 		SetupButtonListeners();
+		SetupOptionsControls();
 		StateMapping();
 		SetState(UIState.IntroductionUI);
 	}
@@ -66,6 +72,33 @@ public class UIStateManager : MonoBehaviour
 			{ UIState.OptionsUI, new[] { optionsPanel } },
 			{ UIState.WinUI, new[] { winPanel } }
 		};
+	}
+
+	private void SetupOptionsControls()
+	{
+		if (musicVolumeSlider != null && musicManager != null)
+		{
+			musicVolumeSlider.value = musicManager.GetMasterMusicVolume();
+			musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
+			UpdateMusicVolumeText();
+		}
+	}
+
+	private void OnMusicVolumeChanged(float value)
+	{
+		if (musicManager != null)
+		{
+			musicManager.SetMasterMusicVolume(value);
+			UpdateMusicVolumeText();
+		}
+	}
+
+	private void UpdateMusicVolumeText()
+	{
+		if (musicVolumeText != null)
+		{
+			musicVolumeText.text = $"Music Volume: {(musicVolumeSlider.value * 100):F0}%";
+		}
 	}
 
 	private void SetupButtonListeners()
