@@ -132,15 +132,6 @@ public class ThunderstormManager : MonoBehaviour
 			CheckForLightningStrike(currentHeight);
 			SetNextStrikeTime();
 		}
-
-		if (rainParticleSystem != null)
-		{
-			rainParticleSystem.transform.position = new Vector3(
-				rocketController.transform.position.x,
-				rocketController.transform.position.y + 20f,
-				rocketController.transform.position.z
-			);
-		}
 	}
 
 	private void UpdateRainSystem(float currentHeight)
