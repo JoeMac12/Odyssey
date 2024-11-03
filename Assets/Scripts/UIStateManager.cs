@@ -41,11 +41,28 @@ public class UIStateManager : MonoBehaviour
 
 	private UIState currentState;
 	private UIState previousState;
+	private Dictionary<UIState, GameObject[]> stateToUI;
 
 	public void Initialize()
 	{
 		SetupButtonListeners();
+		StateMapping();
 		SetState(UIState.IntroductionUI);
+	}
+
+	private void StateMapping()
+	{
+		stateToUI = new Dictionary<UIState, GameObject[]>
+		{
+			{ UIState.IntroductionUI, new[] { introductionPanel } },
+			{ UIState.GameControlsInfoUI, new[] { gameControlsPanel } },
+			{ UIState.GameplayUI, new[] { rocketUI, weatherUI, rocketPanelUI } },
+			{ UIState.FlightPerformanceUI, new[] { performancePanel } },
+			{ UIState.UpgradeUI, new[] { upgradePanel } },
+			{ UIState.PauseUI, new[] { pauseMenuPanel } },
+			{ UIState.OptionsUI, new[] { optionsPanel } },
+			{ UIState.WinUI, new[] { winPanel } }
+		};
 	}
 
 	private void SetupButtonListeners()
@@ -67,16 +84,16 @@ public class UIStateManager : MonoBehaviour
 	{
 		if (newState == UIState.PauseUI)
 		{
-			previousState = currentState;
+			if (currentState != UIState.OptionsUI)
+			{
+				previousState = currentState;
+			}
 			StartCoroutine(ShowPauseMenu());
-			currentState = newState;
 			return;
 		}
 		else if (newState == UIState.OptionsUI)
 		{
-			previousState = currentState;
 			StartCoroutine(ShowOptionsMenu());
-			currentState = newState;
 			return;
 		}
 
@@ -85,8 +102,7 @@ public class UIStateManager : MonoBehaviour
 
 	public void ReturnFromPause()
 	{
-		StartCoroutine(HidePauseMenu());
-		currentState = previousState;
+		StartCoroutine(TransitionFromPause());
 	}
 
 	public void ReturnFromOptions()
@@ -97,23 +113,45 @@ public class UIStateManager : MonoBehaviour
 
 	private IEnumerator ShowPauseMenu()
 	{
+		yield return StartCoroutine(FadeOutCurrentState());
+		DisableAllUI();
+
 		pauseMenuPanel.SetActive(true);
 		CanvasGroup pauseGroup = pauseMenuPanel.GetComponent<CanvasGroup>();
 		yield return StartCoroutine(FadeInPanel(pauseGroup));
+		currentState = UIState.PauseUI;
 	}
 
-	private IEnumerator ShowOptionsMenu()
-	{
-		optionsPanel.SetActive(true);
-		CanvasGroup optionsGroup = optionsPanel.GetComponent<CanvasGroup>();
-		yield return StartCoroutine(FadeInPanel(optionsGroup));
-	}
-
-	private IEnumerator HidePauseMenu()
+	private IEnumerator TransitionFromPause()
 	{
 		CanvasGroup pauseGroup = pauseMenuPanel.GetComponent<CanvasGroup>();
 		yield return StartCoroutine(FadeOutPanel(pauseGroup));
 		pauseMenuPanel.SetActive(false);
+
+		if (stateToUI.TryGetValue(previousState, out GameObject[] uiElements))
+		{
+			foreach (var element in uiElements)
+			{
+				element.SetActive(true);
+				if (element.TryGetComponent<CanvasGroup>(out var canvasGroup))
+				{
+					yield return StartCoroutine(FadeInPanel(canvasGroup));
+				}
+			}
+		}
+
+		currentState = previousState;
+	}
+
+	private IEnumerator ShowOptionsMenu()
+	{
+		yield return StartCoroutine(FadeOutCurrentState());
+		DisableAllUI();
+
+		optionsPanel.SetActive(true);
+		CanvasGroup optionsGroup = optionsPanel.GetComponent<CanvasGroup>();
+		yield return StartCoroutine(FadeInPanel(optionsGroup));
+		currentState = UIState.OptionsUI;
 	}
 
 	private IEnumerator HideOptionsMenu()
@@ -130,102 +168,52 @@ public class UIStateManager : MonoBehaviour
 			yield return StartCoroutine(FadeOutCurrentState());
 		}
 
-		DisableAllUI(preservePauseMenu: currentState == UIState.PauseUI || currentState == UIState.OptionsUI);
+		DisableAllUI();
 
-		switch (newState)
+		if (stateToUI.TryGetValue(newState, out GameObject[] newStateUI))
 		{
-			case UIState.IntroductionUI:
-				introductionPanel.SetActive(true);
-				yield return StartCoroutine(FadeInPanel(introductionPanel.GetComponent<CanvasGroup>()));
-				break;
-
-			case UIState.GameControlsInfoUI:
-				gameControlsPanel.SetActive(true);
-				yield return StartCoroutine(FadeInPanel(gameControlsPanel.GetComponent<CanvasGroup>()));
-				break;
-
-			case UIState.GameplayUI:
-				yield return StartCoroutine(EnableGameplayUI());
-				break;
-
-			case UIState.FlightPerformanceUI:
-				performancePanel.SetActive(true);
-				yield return StartCoroutine(FadeInPanel(performancePanel.GetComponent<CanvasGroup>()));
-				break;
-
-			case UIState.UpgradeUI:
-				upgradePanel.SetActive(true);
-				yield return StartCoroutine(FadeInPanel(upgradePanel.GetComponent<CanvasGroup>()));
-				break;
-
-			case UIState.WinUI:
-				winPanel.SetActive(true);
-				yield return StartCoroutine(FadeInPanel(winPanel.GetComponent<CanvasGroup>()));
-				break;
+			foreach (var element in newStateUI)
+			{
+				element.SetActive(true);
+				if (element.TryGetComponent<CanvasGroup>(out var canvasGroup))
+				{
+					yield return StartCoroutine(FadeInPanel(canvasGroup));
+				}
+			}
 		}
 
 		currentState = newState;
 	}
 
-	private void DisableAllUI(bool preservePauseMenu = false)
+	private void DisableAllUI()
 	{
-		introductionPanel.SetActive(false);
-		gameControlsPanel.SetActive(false);
-		rocketUI.SetActive(false);
-		weatherUI.SetActive(false);
-		rocketPanelUI.SetActive(false);
-		performancePanel.SetActive(false);
-		upgradePanel.SetActive(false);
-		winPanel.SetActive(false);
-
-		if (!preservePauseMenu)
+		foreach (var uiElements in stateToUI.Values)
 		{
-			pauseMenuPanel.SetActive(false);
-			optionsPanel.SetActive(false);
-		}
-	}
-
-	private IEnumerator EnableGameplayUI()
-	{
-		rocketUI.SetActive(true);
-		weatherUI.SetActive(true);
-		rocketPanelUI.SetActive(true);
-
-		CanvasGroup[] groups = {
-			rocketUI.GetComponent<CanvasGroup>(),
-			weatherUI.GetComponent<CanvasGroup>(),
-			rocketPanelUI.GetComponent<CanvasGroup>()
-		};
-
-		foreach (var group in groups)
-		{
-			group.alpha = 0f;
-		}
-
-		float elapsedTime = 0f;
-		while (elapsedTime < panelFadeDuration)
-		{
-			float alpha = Mathf.Lerp(0f, 1f, elapsedTime / panelFadeDuration);
-			foreach (var group in groups)
+			foreach (var element in uiElements)
 			{
-				group.alpha = alpha;
+				element.SetActive(false);
 			}
-			elapsedTime += Time.deltaTime;
-			yield return null;
-		}
-
-		foreach (var group in groups)
-		{
-			group.alpha = 1f;
 		}
 	}
 
 	private IEnumerator FadeOutCurrentState()
 	{
-		CanvasGroup[] activeGroups = GetActiveCanvasGroups();
-		if (activeGroups.Length == 0) yield break;
+		if (stateToUI.TryGetValue(currentState, out GameObject[] currentStateUI))
+		{
+			var activeGroups = new List<CanvasGroup>();
+			foreach (var element in currentStateUI)
+			{
+				if (element.activeSelf && element.TryGetComponent<CanvasGroup>(out var canvasGroup))
+				{
+					activeGroups.Add(canvasGroup);
+				}
+			}
 
-		yield return StartCoroutine(FadeOutPanels(activeGroups));
+			if (activeGroups.Count > 0)
+			{
+				yield return StartCoroutine(FadeOutPanels(activeGroups.ToArray()));
+			}
+		}
 	}
 
 	private IEnumerator FadeOutPanels(CanvasGroup[] groups)
@@ -258,22 +246,6 @@ public class UIStateManager : MonoBehaviour
 			yield return null;
 		}
 		group.alpha = 0f;
-	}
-
-	private CanvasGroup[] GetActiveCanvasGroups()
-	{
-		var activeGroups = new List<CanvasGroup>();
-
-		if (introductionPanel.activeSelf) activeGroups.Add(introductionPanel.GetComponent<CanvasGroup>());
-		if (gameControlsPanel.activeSelf) activeGroups.Add(gameControlsPanel.GetComponent<CanvasGroup>());
-		if (rocketUI.activeSelf) activeGroups.Add(rocketUI.GetComponent<CanvasGroup>());
-		if (weatherUI.activeSelf) activeGroups.Add(weatherUI.GetComponent<CanvasGroup>());
-		if (rocketPanelUI.activeSelf) activeGroups.Add(rocketPanelUI.GetComponent<CanvasGroup>());
-		if (performancePanel.activeSelf) activeGroups.Add(performancePanel.GetComponent<CanvasGroup>());
-		if (upgradePanel.activeSelf) activeGroups.Add(upgradePanel.GetComponent<CanvasGroup>());
-		if (winPanel.activeSelf) activeGroups.Add(winPanel.GetComponent<CanvasGroup>());
-
-		return activeGroups.ToArray();
 	}
 
 	private IEnumerator FadeInPanel(CanvasGroup canvasGroup)
