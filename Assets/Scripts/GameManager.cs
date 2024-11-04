@@ -149,6 +149,11 @@ public class GameManager : MonoBehaviour
 		if (maxAltitude >= winAltitude && !hasWon)
 		{
 			hasWon = true;
+			if (rocketController != null)
+			{
+				rocketController.enabled = false;
+				rocketController.gameObject.SetActive(false);
+			}
 			StartCoroutine(ShowWinPanel());
 		}
 	}
