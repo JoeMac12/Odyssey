@@ -36,14 +36,17 @@ public class MusicManager : MonoBehaviour
 		gameplaySource = gameObject.AddComponent<AudioSource>();
 		interfaceSource = gameObject.AddComponent<AudioSource>();
 
-		SetupAuto(gameplaySource, gameplayMusic);
-		SetupAuto(interfaceSource, interfaceMusic);
+		SetupAudio(gameplaySource, gameplayMusic);
+		SetupAudio(interfaceSource, interfaceMusic);
+
+		PreloadAudio(gameplaySource);
+		PreloadAudio(interfaceSource);
 
 		gameplaySource.volume = 0;
 		interfaceSource.volume = 0;
 	}
 
-	private void SetupAuto(AudioSource source, MusicTrack track)
+	private void SetupAudio(AudioSource source, MusicTrack track)
 	{
 		if (track != null && track.clip != null)
 		{
@@ -51,6 +54,18 @@ public class MusicManager : MonoBehaviour
 			source.loop = true;
 			source.playOnAwake = false;
 			source.volume = 0;
+
+			source.clip.LoadAudioData();
+		}
+	}
+
+	private void PreloadAudio(AudioSource source)
+	{
+		if (source != null && source.clip != null)
+		{
+			source.Play();
+			source.Pause();
+			source.time = 0;
 		}
 	}
 
@@ -58,7 +73,7 @@ public class MusicManager : MonoBehaviour
 	{
 		if (!gameplaySource.isPlaying)
 		{
-			gameplaySource.Play();
+			gameplaySource.UnPause();
 		}
 		CrossFadeToGameplay();
 	}
@@ -67,7 +82,7 @@ public class MusicManager : MonoBehaviour
 	{
 		if (!interfaceSource.isPlaying)
 		{
-			interfaceSource.Play();
+			interfaceSource.UnPause();
 		}
 		CrossFadeToInterface();
 	}
@@ -173,6 +188,7 @@ public class MusicManager : MonoBehaviour
 
 		fadeOutSource.volume = 0f;
 		fadeInSource.volume = targetVolume;
+		fadeOutSource.Pause();
 		isFading = false;
 	}
 
@@ -199,8 +215,8 @@ public class MusicManager : MonoBehaviour
 
 		gameplaySource.volume = 0f;
 		interfaceSource.volume = 0f;
-		gameplaySource.Stop();
-		interfaceSource.Stop();
+		gameplaySource.Pause();
+		interfaceSource.Pause();
 		isFading = false;
 	}
 
