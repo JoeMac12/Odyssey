@@ -19,7 +19,7 @@ public class MusicManager : MonoBehaviour
 
 	[Header("Transition Settings")]
 	public float crossFadeDuration = 1.5f;
-	public float maxVolume = 0.8f;
+	public float maxVolume = 1f;
 
 	private AudioSource gameplaySource;
 	private AudioSource interfaceSource;
