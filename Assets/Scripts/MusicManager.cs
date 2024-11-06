@@ -20,7 +20,6 @@ public class MusicManager : MonoBehaviour
 	[Header("Transition Settings")]
 	public float crossFadeDuration = 1.5f;
 	public float maxVolume = 0.8f;
-	public float pauseMulti = 0.25f;
 
 	private AudioSource gameplaySource;
 	private AudioSource interfaceSource;
@@ -28,7 +27,6 @@ public class MusicManager : MonoBehaviour
 
 	private float targetGameplayVolume = 0f;
 	private float targetInterfaceVolume = 0f;
-	private Coroutine volTime;
 	private float masterMusicVolume = 1f;
 
 	private void Awake()
@@ -54,7 +52,6 @@ public class MusicManager : MonoBehaviour
 			source.loop = true;
 			source.playOnAwake = false;
 			source.volume = 0;
-
 			source.clip.LoadAudioData();
 		}
 	}
@@ -121,42 +118,6 @@ public class MusicManager : MonoBehaviour
 		{
 			interfaceSource.volume = targetInterfaceVolume * masterMusicVolume;
 		}
-	}
-
-	public void AdjustMusicVolume(bool isPaused)
-	{
-		if (volTime != null)
-		{
-			StopCoroutine(volTime);
-		}
-		volTime = StartCoroutine(AdjustVolume(isPaused));
-	}
-
-	private IEnumerator AdjustVolume(bool isPaused)
-	{
-		float startGameplayVolume = gameplaySource.volume;
-		float startInterfaceVolume = interfaceSource.volume;
-
-		float targetMultiplier = isPaused ? pauseMulti : 1f;
-		float targetGameplay = targetGameplayVolume * targetMultiplier * masterMusicVolume;
-		float targetInterface = targetInterfaceVolume * targetMultiplier * masterMusicVolume;
-
-		float elapsed = 0f;
-		float duration = 0.25f;
-
-		while (elapsed < duration)
-		{
-			elapsed += Time.unscaledDeltaTime;
-			float t = elapsed / duration;
-
-			gameplaySource.volume = Mathf.Lerp(startGameplayVolume, targetGameplay, t);
-			interfaceSource.volume = Mathf.Lerp(startInterfaceVolume, targetInterface, t);
-
-			yield return null;
-		}
-
-		gameplaySource.volume = targetGameplay;
-		interfaceSource.volume = targetInterface;
 	}
 
 	private IEnumerator CrossFade(AudioSource fadeOutSource, AudioSource fadeInSource)

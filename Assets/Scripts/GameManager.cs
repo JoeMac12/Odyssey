@@ -294,11 +294,6 @@ public class GameManager : MonoBehaviour
 
 		Time.timeScale = isPaused ? 0f : 1f;
 
-		if (musicManager != null)
-		{
-			musicManager.AdjustMusicVolume(isPaused);
-		}
-
 		if (rocketController != null)
 		{
 			rocketController.enabled = !isPaused;
