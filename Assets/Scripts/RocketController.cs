@@ -24,6 +24,10 @@ public class RocketController : MonoBehaviour
 	public TMP_Text healthText;
 	public TMP_Text armorText;
 
+	[Header("Drag Settings")]
+	public float normalDrag = 0.05f;
+	public float endDrag = 3f;
+
 	[Header("Sound Effects")]
 	public AudioSource explosionSound;
 	public float explosionVolume = 1f;
@@ -132,6 +136,8 @@ public class RocketController : MonoBehaviour
 
 		IsThrusting = Input.GetKey(KeyCode.Space) && currentFuel > 0f;
 
+		UpdateDrag();
+
 		if (IsThrusting)
 		{
 			if (!hasLaunched)
@@ -187,6 +193,17 @@ public class RocketController : MonoBehaviour
 		ApplyRotation();
 		LimitVelocity();
 		UpdateUI();
+	}
+
+	void UpdateDrag()
+	{
+		rb.drag = normalDrag;
+
+		if (currentFuel <= 0 && rb.velocity.y > 0)
+		{
+			Vector3 upwardVelocity = Vector3.up * Mathf.Max(0, Vector3.Dot(rb.velocity, Vector3.up));
+			rb.AddForce(-upwardVelocity * endDrag);
+		}
 	}
 
 	void ApplyRotation()
