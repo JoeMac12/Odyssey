@@ -194,14 +194,19 @@ public class GameManager : MonoBehaviour
 	{
 		float flightTime = Time.time - rocketController.FlightStartTime;
 
-		maxAltitudeText.text = $"Max Altitude: {maxAltitude:F2} ft";
-		maxSpeedText.text = $"Max Speed: {maxSpeed:F2} MPH";
-		flightTimeText.text = $"Flight Time: {flightTime:F2} s";
-		distanceTravelledText.text = $"Distance Travelled: {distanceTravelled:F2} ft";
+		float altitudeEarnings = maxAltitude * altitudeMultiplier;
+		float speedEarnings = maxSpeed * speedMultiplier;
+		float timeEarnings = flightTime * timeMultiplier;
+		float distanceEarnings = distanceTravelled * distanceMultiplier;
 
-		float moneyEarned = CalculateMoneyEarned(maxAltitude, maxSpeed, flightTime, distanceTravelled);
-		totalMoneyEarned += moneyEarned;
-		moneyEarnedText.text = $"Money Earned: ${moneyEarned:F2}";
+		maxAltitudeText.text = $"Max Altitude: {maxAltitude:F0} ft (<color=orange>${altitudeEarnings:F0}</color>)";
+		maxSpeedText.text = $"Max Speed: {maxSpeed:F0} MPH (<color=orange>${speedEarnings:F0}</color>)";
+		flightTimeText.text = $"Flight Time: {flightTime:F0} s (<color=orange>${timeEarnings:F0}</color>)";
+		distanceTravelledText.text = $"Distance Travelled: {distanceTravelled:F0} ft (<color=orange>${distanceEarnings:F0}</color>)";
+
+		float totalEarnings = altitudeEarnings + speedEarnings + timeEarnings + distanceEarnings;
+		totalMoneyEarned += totalEarnings;
+		moneyEarnedText.text = $"Total Money Earned: <color=orange>${totalEarnings:F0}</color>";
 
 		upgradeManager.UpdateCurrentMoneyText();
 	}

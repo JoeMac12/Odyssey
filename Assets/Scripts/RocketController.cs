@@ -288,16 +288,16 @@ public class RocketController : MonoBehaviour
 	void UpdateUI()
 	{
 		float speedMPH = rb.velocity.magnitude * 2.237f;
-		speedText.text = $"Speed: {speedMPH:F1} MPH";
+		speedText.text = $"Speed: {speedMPH:F0} MPH";
 
 		float altitude = transform.position.y * 3.281f;
-		altitudeText.text = $"Altitude: {altitude:F1} ft";
+		altitudeText.text = $"Altitude: {altitude:F0} ft";
 
-		flightTimeText.text = $"Flight Time: {flightTime:F1} s";
+		flightTimeText.text = $"Flight Time: {flightTime:F0} s";
 
 		Quaternion deltaRotation = Quaternion.Inverse(initialRotation) * transform.rotation;
 		float bankAngle = NormalizeAngle(deltaRotation.eulerAngles.z);
-		bankAngleText.text = $"Bank Angle: {bankAngle:F1}°";
+		bankAngleText.text = $"Bank Angle: {bankAngle:F0}°";
 
 		if (healthText != null)
 		{

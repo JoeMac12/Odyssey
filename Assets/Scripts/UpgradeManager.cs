@@ -262,10 +262,10 @@ public class UpgradeManager : MonoBehaviour
 		if (increase > 0)
 		{
 			float newValue = currentValue + increase;
-			string format = isPercentage ? "{0:F1}%" : "{0:F1}";
+			string format = isPercentage ? "{0:F0}%" : "{0:F0}";
 			return $"{statName}: \n{string.Format(format, currentValue)} <color=green>-> {string.Format(format, newValue)}</color>";
 		}
-		return $"{statName}: {(isPercentage ? $"{currentValue:F1}%" : $"{currentValue:F1}")}";
+		return $"{statName}: {(isPercentage ? $"{currentValue:F0}%" : $"{currentValue:F0}")}";
 	}
 
 	private Upgrade GetUpgradeByName(string name)
@@ -330,7 +330,7 @@ public class UpgradeManager : MonoBehaviour
 			{
 				float nextCost = CalculateUpgradeCost(upgrade);
 				string costColor = gameManager.GetTotalMoneyEarned() >= nextCost ? "green" : "red";
-				upgrade.upgradeText.text = $"{upgrade.name} (Tier {upgrade.currentTier}/10)\nCost: <color={costColor}>${nextCost:F2}</color>";
+				upgrade.upgradeText.text = $"{upgrade.name} (Tier {upgrade.currentTier}/10)\nCost: <color={costColor}>${nextCost:F0}</color>";
 			}
 		}
 	}
@@ -339,7 +339,7 @@ public class UpgradeManager : MonoBehaviour
 	{
 		if (currentMoneyText != null)
 		{
-			currentMoneyText.text = $"Current Money: ${gameManager.GetTotalMoneyEarned():F2}";
+			currentMoneyText.text = $"Current Money: ${gameManager.GetTotalMoneyEarned():F0}";
 		}
 
 		foreach (var upgrade in upgrades)
