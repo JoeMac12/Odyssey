@@ -28,6 +28,9 @@ public class RocketController : MonoBehaviour
 	public float normalDrag = 0.05f;
 	public float endDrag = 3f;
 
+	[Header("Engine Effects")]
+	public GameObject thrustFlame;
+
 	[Header("Sound Effects")]
 	public AudioSource explosionSound;
 	public float explosionVolume = 1f;
@@ -135,6 +138,11 @@ public class RocketController : MonoBehaviour
 		}
 
 		IsThrusting = Input.GetKey(KeyCode.Space) && currentFuel > 0f;
+
+		if (thrustFlame != null)
+		{
+			thrustFlame.SetActive(IsThrusting);
+		}
 
 		UpdateDrag();
 
@@ -387,6 +395,11 @@ public class RocketController : MonoBehaviour
 		if (thrustSound != null)
 		{
 			thrustSound.Stop();
+		}
+
+		if (thrustFlame != null)
+		{
+			thrustFlame.SetActive(false);
 		}
 
 		if (rocketLight != null)
