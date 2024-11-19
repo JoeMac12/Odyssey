@@ -31,6 +31,18 @@ public class RocketController : MonoBehaviour
 	[Header("Engine Effects")]
 	public GameObject thrustFlame;
 
+	[Header("Thrust Materials")]
+	public Material thrustFlameMaterial;
+	public Material thrustSmokeMaterial;
+
+	[Header("Fade Settings")]
+	public float fadeInSpeed = 4f;
+	public float fadeOutSpeed = 2f;
+	public float maxAlpha = 0.9f;
+
+	private float currentEffectsAlpha = 0f;
+	private static readonly string alphaProb = "_Alpha";
+
 	[Header("Sound Effects")]
 	public AudioSource explosionSound;
 	public float explosionVolume = 1f;
@@ -88,6 +100,20 @@ public class RocketController : MonoBehaviour
 			explosionSound.playOnAwake = false;
 			explosionSound.volume = explosionVolume;
 		}
+
+		InitializeThrustEffects();
+	}
+
+	private void InitializeThrustEffects()
+	{
+		if (thrustFlameMaterial != null)
+		{
+			thrustFlameMaterial.SetFloat(alphaProb, 0f);
+		}
+		if (thrustSmokeMaterial != null)
+		{
+			thrustSmokeMaterial.SetFloat(alphaProb, 0f);
+		}
 	}
 
 	void OnTriggerEnter(Collider other)
@@ -141,7 +167,7 @@ public class RocketController : MonoBehaviour
 
 		if (thrustFlame != null)
 		{
-			thrustFlame.SetActive(IsThrusting);
+			UpdateThrustEffectsVisibility();
 		}
 
 		UpdateDrag();
@@ -201,6 +227,40 @@ public class RocketController : MonoBehaviour
 		ApplyRotation();
 		LimitVelocity();
 		UpdateUI();
+	}
+
+	private void UpdateThrustEffectsVisibility()
+	{
+		if (thrustFlameMaterial == null && thrustSmokeMaterial == null) return;
+
+		if (IsThrusting)
+		{
+			currentEffectsAlpha = Mathf.MoveTowards(currentEffectsAlpha, maxAlpha, fadeInSpeed * Time.fixedDeltaTime);
+		}
+		else
+		{
+			currentEffectsAlpha = Mathf.MoveTowards(currentEffectsAlpha, 0f, fadeOutSpeed * Time.fixedDeltaTime);
+		}
+
+		UpdateMaterialAlpha(thrustFlameMaterial, currentEffectsAlpha);
+		UpdateMaterialAlpha(thrustSmokeMaterial, currentEffectsAlpha);
+
+		if (!thrustFlame.activeSelf && currentEffectsAlpha > 0f)
+		{
+			thrustFlame.SetActive(true);
+		}
+		else if (thrustFlame.activeSelf && currentEffectsAlpha <= 0f)
+		{
+			thrustFlame.SetActive(false);
+		}
+	}
+
+	private void UpdateMaterialAlpha(Material material, float alpha)
+	{
+		if (material != null)
+		{
+			material.SetFloat(alphaProb, alpha);
+		}
 	}
 
 	void UpdateDrag()
@@ -396,6 +456,9 @@ public class RocketController : MonoBehaviour
 		{
 			thrustSound.Stop();
 		}
+
+		currentEffectsAlpha = 0f;
+		InitializeThrustEffects();
 
 		if (thrustFlame != null)
 		{
