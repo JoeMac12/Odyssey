@@ -23,6 +23,11 @@ public class GameManager : MonoBehaviour
 	public Button closeUpgradeMenuButton;
 	public Button selfDestructButton;
 
+	[Header("Progress Bar")]
+	public RectTransform progressBarBackground;
+	public RectTransform rocketIcon;
+	public float maxBarHeight = 500f;
+
 	[Header("Pause Menu")]
 	public Button resumeButton;
 	public Button mainMenuButton;
@@ -113,11 +118,24 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
+	private void UpdateProgressBar()
+	{
+		if (rocketController == null || rocketIcon == null) return;
+
+		float currentAltitude = (rocketController.transform.position.y - initialPosition.y) * metersToFeet;
+		float progress = Mathf.Clamp01(currentAltitude / winAltitude);
+
+		Vector2 iconAnchoredPosition = rocketIcon.anchoredPosition;
+		iconAnchoredPosition.y = maxBarHeight * progress;
+		rocketIcon.anchoredPosition = iconAnchoredPosition;
+	}
+
 	private void Update()
 	{
 		if (!rocketController.IsExploded && !hasWon)
 		{
 			UpdateFlightStats();
+			UpdateProgressBar();
 			CheckWinCondition();
 		}
 
