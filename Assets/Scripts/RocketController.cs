@@ -9,6 +9,7 @@ public class RocketController : MonoBehaviour
 	public GameManager gameManager;
 	public float thrust = 1250f;
 	public float rotationSpeed = 250f;
+	public float yawRotationSpeed = 250f;
 	public float maxVelocity = 9999f;
 	public float maxFuel = 100f;
 	public float fuelRate = 10f;
@@ -279,6 +280,10 @@ public class RocketController : MonoBehaviour
 		float moveHorizontal = -Input.GetAxis("Horizontal");
 		float moveVertical = -Input.GetAxis("Vertical");
 
+		float yawInput = 0f;
+		if (Input.GetKey(KeyCode.Q)) yawInput = 1f;
+		if (Input.GetKey(KeyCode.E)) yawInput = -1f;
+
 		Vector3 rotation = new Vector3(moveVertical, 0.0f, -moveHorizontal);
 
 		Quaternion currentRotation = transform.rotation;
@@ -291,7 +296,12 @@ public class RocketController : MonoBehaviour
 
 		rb.AddRelativeTorque(rotation.x * rotationSpeed, 0f, rotation.z * rotationSpeed);
 
-		if (rotation.magnitude == 0f && IsThrusting && currentFuel > 0f)
+		if (yawInput != 0)
+		{
+			rb.AddRelativeTorque(0f, yawInput * yawRotationSpeed, 0f);
+		}
+
+		if (rotation.magnitude == 0f && yawInput == 0f && IsThrusting && currentFuel > 0f)
 		{
 			StraightenRocket(deltaEulerAngles);
 		}
