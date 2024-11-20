@@ -284,7 +284,19 @@ public class RocketController : MonoBehaviour
 		if (Input.GetKey(KeyCode.Q)) yawInput = 1f;
 		if (Input.GetKey(KeyCode.E)) yawInput = -1f;
 
-		Vector3 rotation = new Vector3(moveVertical, 0.0f, -moveHorizontal);
+		Vector3 cameraForward = cameraController.transform.forward;
+		Vector3 cameraRight = cameraController.transform.right;
+
+		cameraForward.y = 0;
+		cameraRight.y = 0;
+		cameraForward.Normalize();
+		cameraRight.Normalize();
+
+		Vector3 inputDirection = (cameraForward * moveVertical + cameraRight * moveHorizontal).normalized;
+
+		Vector3 localInput = transform.InverseTransformDirection(inputDirection);
+
+		Vector3 rotation = new Vector3(-localInput.z, 0.0f, localInput.x);
 
 		Quaternion currentRotation = transform.rotation;
 		Quaternion deltaRotation = Quaternion.Inverse(initialRotation) * currentRotation;
@@ -294,14 +306,17 @@ public class RocketController : MonoBehaviour
 		deltaEulerAngles.y = NormalizeAngle(deltaEulerAngles.y);
 		deltaEulerAngles.z = NormalizeAngle(deltaEulerAngles.z);
 
-		rb.AddRelativeTorque(rotation.x * rotationSpeed, 0f, rotation.z * rotationSpeed);
+		if (rotation.magnitude > 0.01f)
+		{
+			rb.AddRelativeTorque(rotation.x * rotationSpeed, 0f, rotation.z * rotationSpeed);
+		}
 
 		if (yawInput != 0)
 		{
 			rb.AddRelativeTorque(0f, yawInput * yawRotationSpeed, 0f);
 		}
 
-		if (rotation.magnitude == 0f && yawInput == 0f && IsThrusting && currentFuel > 0f)
+		if (rotation.magnitude < 0.01f && yawInput == 0f && IsThrusting && currentFuel > 0f)
 		{
 			StraightenRocket(deltaEulerAngles);
 		}
