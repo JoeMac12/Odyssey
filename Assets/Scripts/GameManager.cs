@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour
 	private float maxSpeed;
 	private float distanceTravelled;
 	private float totalMoneyEarned = 0f;
+	private float moneyMultiplier = 1f;
 	private bool isPaused = false;
 	private bool hasWon = false;
 
@@ -208,6 +209,21 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
+	public void UpdateMoneyMultiplier(float percentage)
+	{
+		moneyMultiplier += percentage / 100f;
+	}
+
+	public void ResetMoneyMultiplier()
+	{
+		moneyMultiplier = 1f;
+	}
+
+	public float GetMoneyMultiplier()
+	{
+		return moneyMultiplier;
+	}
+
 	private void UpdatePerformanceUI()
 	{
 		float flightTime = Time.time - rocketController.FlightStartTime;
@@ -217,15 +233,23 @@ public class GameManager : MonoBehaviour
 		float timeEarnings = flightTime * timeMultiplier;
 		float distanceEarnings = distanceTravelled * distanceMultiplier;
 
+		float totalEarnings = (altitudeEarnings + speedEarnings + timeEarnings + distanceEarnings) * moneyMultiplier;
+
 		maxAltitudeText.text = $"Max Altitude: {maxAltitude:F0} ft (<color=orange>${altitudeEarnings:F0}</color>)";
 		maxSpeedText.text = $"Max Speed: {maxSpeed:F0} MPH (<color=orange>${speedEarnings:F0}</color>)";
 		flightTimeText.text = $"Flight Time: {flightTime:F0} s (<color=orange>${timeEarnings:F0}</color>)";
 		distanceTravelledText.text = $"Distance Travelled: {distanceTravelled:F0} ft (<color=orange>${distanceEarnings:F0}</color>)";
 
-		float totalEarnings = altitudeEarnings + speedEarnings + timeEarnings + distanceEarnings;
-		totalMoneyEarned += totalEarnings;
-		moneyEarnedText.text = $"Total Money Earned: <color=orange>${totalEarnings:F0}</color>";
+		if (moneyMultiplier > 1f)
+		{
+			moneyEarnedText.text = $"Total Money Earned: <color=orange>${totalEarnings:F0}</color> (x{moneyMultiplier:F2} bonus)";
+		}
+		else
+		{
+			moneyEarnedText.text = $"Total Money Earned: <color=orange>${totalEarnings:F0}</color>";
+		}
 
+		totalMoneyEarned += totalEarnings;
 		upgradeManager.UpdateCurrentMoneyText();
 	}
 

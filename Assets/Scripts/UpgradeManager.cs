@@ -39,11 +39,13 @@ public class UpgradeManager : MonoBehaviour
 	public Button fuelTankUpgradeButton;
 	public Button aerodynamicsUpgradeButton;
 	public Button hullUpgradeButton;
+	public Button moneyMultiplierButton;
 	public TMP_Text engineUpgradeText;
 	public TMP_Text fuelTankUpgradeText;
 	public TMP_Text aerodynamicsUpgradeText;
 	public TMP_Text hullUpgradeText;
 	public TMP_Text currentMoneyText;
+	public TMP_Text moneyMultiplierText;
 
 	[Header("Tooltip")]
 	public GameObject tooltipPanel;
@@ -55,6 +57,7 @@ public class UpgradeManager : MonoBehaviour
 	public TMP_Text fuelStatsText;
 	public TMP_Text rotationStatsText;
 	public TMP_Text armorStatsText;
+	public TMP_Text moneyMultiplierStatsText;
 
 	private string currentlyHoveredUpgrade = "";
 
@@ -170,6 +173,17 @@ public class UpgradeManager : MonoBehaviour
 				basePercentage = 5f,
 				upgradeButton = hullUpgradeButton,
 				upgradeText = hullUpgradeText
+			},
+			new Upgrade {
+				name = "Money Multiplier",
+				description = "Advanced analytics and data collection systems.\n\n" +
+							"Increases all your earnings for each flight attempt.",
+				currentTier = 0,
+				basePrice = 300,
+				baseValue = 0,
+				basePercentage = 2f,
+				upgradeButton = moneyMultiplierButton,
+				upgradeText = moneyMultiplierText
 			}
 		};
 
@@ -251,10 +265,16 @@ public class UpgradeManager : MonoBehaviour
 			currentlyHoveredUpgrade == "Hull" ? GetUpgradeByName("Hull").basePercentage : 0,
 			true);
 
+		float currentMultiplier = (gameManager.GetMoneyMultiplier() - 1f) * 100f;
+		string moneyLine = FormatStatLine("Money Bonus", currentMultiplier,
+			currentlyHoveredUpgrade == "Money Multiplier" ? GetUpgradeByName("Money Multiplier").basePercentage : 0,
+			true);
+
 		if (thrustStatsText != null) thrustStatsText.text = thrustLine;
 		if (fuelStatsText != null) fuelStatsText.text = fuelLine;
 		if (rotationStatsText != null) rotationStatsText.text = rotationLine;
 		if (armorStatsText != null) armorStatsText.text = armorLine;
+		if (moneyMultiplierStatsText != null) moneyMultiplierStatsText.text = moneyLine;
 	}
 
 	private string FormatStatLine(string statName, float currentValue, float increase, bool isPercentage = false)
@@ -314,6 +334,9 @@ public class UpgradeManager : MonoBehaviour
 			case "Hull":
 				rocketController.armorPercentage += upgrade.basePercentage;
 				break;
+			case "Money Multiplier":
+				gameManager.UpdateMoneyMultiplier(upgrade.basePercentage);
+				break;
 		}
 	}
 
@@ -362,6 +385,7 @@ public class UpgradeManager : MonoBehaviour
 		rocketController.maxFuel = 100f;
 		rocketController.rotationSpeed = 250f;
 		rocketController.armorPercentage = 0f;
+		gameManager.ResetMoneyMultiplier();
 
 		UpdateCurrentMoneyText();
 		UpdateStatsDisplay();
