@@ -71,6 +71,14 @@ public class RocketController : MonoBehaviour
 	public Image altitudeArrowDown;
 	public Image altitudeArrowNeutral;
 
+	[Header("Fall Warning")]
+	public AudioSource fallWarningSound;
+	public float warningBeepInterval = 0.5f;
+	public float fallSpeedThreshold = -5f;
+
+	private bool isWarningActive = false;
+	private float nextBeepTime = 0f;
+
 	[HideInInspector]
 	public Rigidbody rb;
 
@@ -177,6 +185,7 @@ public class RocketController : MonoBehaviour
 		}
 
 		UpdateDrag();
+		CheckFallWarning();
 
 		if (IsThrusting)
 		{
@@ -233,6 +242,41 @@ public class RocketController : MonoBehaviour
 		ApplyRotation();
 		LimitVelocity();
 		UpdateUI();
+	}
+
+	private void CheckFallWarning()
+	{
+		if (!hasLaunched || IsExploded) return;
+
+		bool isFalling = rb.velocity.y < fallSpeedThreshold;
+
+		if (isFalling && !isWarningActive)
+		{
+			isWarningActive = true;
+			nextBeepTime = Time.time;
+		}
+		else if (!isFalling && isWarningActive)
+		{
+			isWarningActive = false;
+			if (fallWarningSound != null && fallWarningSound.isPlaying)
+			{
+				fallWarningSound.Stop();
+			}
+		}
+
+		if (isWarningActive && Time.time >= nextBeepTime)
+		{
+			PlayWarningBeep();
+			nextBeepTime = Time.time + warningBeepInterval;
+		}
+	}
+
+	private void PlayWarningBeep()
+	{
+		if (fallWarningSound != null && fallWarningSound.clip != null)
+		{
+			fallWarningSound.Play();
+		}
 	}
 
 	private void UpdateThrustEffectsVisibility()
@@ -514,6 +558,12 @@ public class RocketController : MonoBehaviour
 		if (cameraController != null)
 		{
 			cameraController.controlsEnabled = true;
+		}
+
+		isWarningActive = false;
+		if (fallWarningSound != null && fallWarningSound.isPlaying)
+		{
+			fallWarningSound.Stop();
 		}
 	}
 
