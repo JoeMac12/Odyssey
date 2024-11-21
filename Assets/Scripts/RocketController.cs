@@ -66,6 +66,10 @@ public class RocketController : MonoBehaviour
 	public float damageMultiplier = 1f;
 	public float speedMemoryTime = 0.25f;
 
+	[Header("Direction Indicators")]
+	public Image altitudeArrowUp;
+	public Image altitudeArrowDown;
+
 	[HideInInspector]
 	public Rigidbody rb;
 
@@ -385,6 +389,10 @@ public class RocketController : MonoBehaviour
 
 		float altitude = transform.position.y * 3.281f;
 		altitudeText.text = $"Altitude: {altitude:F0} ft";
+
+		bool isGoingUp = rb.velocity.y > 0.1f;
+		altitudeArrowUp.gameObject.SetActive(isGoingUp);
+		altitudeArrowDown.gameObject.SetActive(!isGoingUp);
 
 		flightTimeText.text = $"Flight Time: {flightTime:F0} s";
 
