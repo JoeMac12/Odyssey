@@ -79,7 +79,7 @@ public class WindManager : MonoBehaviour
 
 		currentGustRotation = new Vector3(
 			Random.Range(-1f, 1f),
-			Random.Range(-1f, 1f),
+			0f,
 			Random.Range(-1f, 1f)
 		).normalized * Random.Range(minGustRotationForce, maxGustRotationForce);
 
@@ -92,9 +92,10 @@ public class WindManager : MonoBehaviour
 		if (rocket != null && rocket.rb != null)
 		{
 			float remainingTime = (gustEndTime - Time.time) / (gustEndTime - (Time.time - Time.fixedDeltaTime));
-
 			Vector3 dampedRotation = currentGustRotation * remainingTime * gustModifier;
-			rocket.rb.AddTorque(dampedRotation, ForceMode.Force);
+
+			Vector3 localRotation = rocket.transform.InverseTransformDirection(dampedRotation);
+			rocket.rb.AddRelativeTorque(localRotation, ForceMode.Force);
 		}
 	}
 
@@ -121,12 +122,9 @@ public class WindManager : MonoBehaviour
 	string GetDirection(float angle)
 	{
 		angle = NormalizeAngle(angle);
-
 		float segmentSize = 360f / 16f;
 		int index = Mathf.RoundToInt(angle / segmentSize);
-
 		if (index == 16) index = 0;
-
 		return windText[index];
 	}
 
@@ -141,7 +139,6 @@ public class WindManager : MonoBehaviour
 	{
 		float altitudeEffect = 1f + (rocket.transform.position.y * altitudeWindMultiplier);
 		float currentWindSpeed = baseWindSpeed * altitudeEffect;
-
 		Vector3 windForce = windDirection * currentWindSpeed;
 		rocket.rb.AddForce(windForce);
 	}
