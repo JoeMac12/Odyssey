@@ -247,6 +247,10 @@ public class GameManager : MonoBehaviour
 	{
 		uiStateManager.SetState(UIStateManager.UIState.GameplayUI);
 		rocketController.ResetRocket(initialPosition);
+		if (cameraController != null)
+		{
+			cameraController.ResetCamera();
+		}
 		ResetFlightStats();
 		windManager.GenerateNewWind();
 
@@ -292,6 +296,10 @@ public class GameManager : MonoBehaviour
 		totalMoneyEarned = 0f;
 		ResetFlightStats();
 		rocketController.ResetRocket(initialPosition);
+		if (cameraController != null)
+		{
+			cameraController.ResetCamera();
+		}
 		upgradeManager.ResetUpgrades();
 
 		uiStateManager.SetState(UIStateManager.UIState.GameplayUI);

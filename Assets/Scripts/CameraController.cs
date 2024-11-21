@@ -20,10 +20,16 @@ public class CameraController : MonoBehaviour
 	private float currentX = 0f;
 	private float currentY = 20f;
 	private float setDistance;
+	private float initialY;
+	private float initialX;
+	private float initialDistance;
 
 	void Start()
 	{
 		setDistance = distance;
+		initialY = currentY;
+		initialX = currentX;
+		initialDistance = distance;
 	}
 
 	void Update()
@@ -65,5 +71,13 @@ public class CameraController : MonoBehaviour
 
 		transform.position = position;
 		transform.LookAt(target.position);
+	}
+
+	public void ResetCamera()
+	{
+		currentX = initialX;
+		currentY = initialY;
+		distance = initialDistance;
+		setDistance = initialDistance;
 	}
 }
