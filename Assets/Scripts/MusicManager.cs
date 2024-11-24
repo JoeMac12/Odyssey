@@ -4,22 +4,7 @@ using UnityEngine;
 
 public class MusicManager : MonoBehaviour
 {
-	[System.Serializable]
-	public class MusicTrack
-	{
-		public string name;
-		public AudioClip clip;
-		[Range(0f, 1f)]
-		public float volume = 1f;
-	}
-
-	[Header("Music Tracks")]
-	public MusicTrack gameplayMusic;
-	public MusicTrack interfaceMusic;
-
-	[Header("Transition Settings")]
-	public float crossFadeDuration = 1.5f;
-	public float maxVolume = 1f;
+	public MusicData musicData;
 
 	private AudioSource gameplaySource;
 	private AudioSource interfaceSource;
@@ -31,11 +16,17 @@ public class MusicManager : MonoBehaviour
 
 	private void Awake()
 	{
+		if (musicData == null)
+		{
+			enabled = false;
+			return;
+		}
+
 		gameplaySource = gameObject.AddComponent<AudioSource>();
 		interfaceSource = gameObject.AddComponent<AudioSource>();
 
-		SetupAudio(gameplaySource, gameplayMusic);
-		SetupAudio(interfaceSource, interfaceMusic);
+		SetupAudio(gameplaySource, musicData.gameplayMusic);
+		SetupAudio(interfaceSource, musicData.interfaceMusic);
 
 		PreloadAudio(gameplaySource);
 		PreloadAudio(interfaceSource);
@@ -44,7 +35,7 @@ public class MusicManager : MonoBehaviour
 		interfaceSource.volume = 0;
 	}
 
-	private void SetupAudio(AudioSource source, MusicTrack track)
+	private void SetupAudio(AudioSource source, MusicData.MusicTrack track)
 	{
 		if (track != null && track.clip != null)
 		{
@@ -126,7 +117,9 @@ public class MusicManager : MonoBehaviour
 		float startTime = Time.time;
 		float initialFadeOutVolume = fadeOutSource.volume;
 		float initialFadeInVolume = fadeInSource.volume;
-		float targetVolume = maxVolume * (fadeInSource == gameplaySource ? gameplayMusic.volume : interfaceMusic.volume) * masterMusicVolume;
+		float targetVolume = musicData.maxVolume *
+			(fadeInSource == gameplaySource ? musicData.gameplayMusic.volume : musicData.interfaceMusic.volume) *
+			masterMusicVolume;
 
 		if (fadeInSource == gameplaySource)
 		{
@@ -139,9 +132,9 @@ public class MusicManager : MonoBehaviour
 			targetInterfaceVolume = targetVolume;
 		}
 
-		while (Time.time - startTime < crossFadeDuration)
+		while (Time.time - startTime < musicData.crossFadeDuration)
 		{
-			float t = (Time.time - startTime) / crossFadeDuration;
+			float t = (Time.time - startTime) / musicData.crossFadeDuration;
 			fadeOutSource.volume = Mathf.Lerp(initialFadeOutVolume, 0f, t);
 			fadeInSource.volume = Mathf.Lerp(initialFadeInVolume, targetVolume, t);
 			yield return null;
@@ -166,9 +159,9 @@ public class MusicManager : MonoBehaviour
 		float initialGameplayVolume = gameplaySource.volume;
 		float initialInterfaceVolume = interfaceSource.volume;
 
-		while (Time.time - startTime < crossFadeDuration)
+		while (Time.time - startTime < musicData.crossFadeDuration)
 		{
-			float t = (Time.time - startTime) / crossFadeDuration;
+			float t = (Time.time - startTime) / musicData.crossFadeDuration;
 			gameplaySource.volume = Mathf.Lerp(initialGameplayVolume, 0f, t);
 			interfaceSource.volume = Mathf.Lerp(initialInterfaceVolume, 0f, t);
 			yield return null;
