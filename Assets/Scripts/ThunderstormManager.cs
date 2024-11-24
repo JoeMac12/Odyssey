@@ -10,22 +10,23 @@ public class ThunderstormManager : MonoBehaviour
 	public float stormStartHeight = 1000f;
 	public float maxStormHeight = 5000f;
 
-	[Header("Lightning Settings")]
+	[Header("Lightning Chance Settings")]
 	public float minStrikeInterval = 3f;
 	public float maxStrikeInterval = 7f;
 	public float baseStrikeChance = 0.08f;
 	public float maxStrikeChance = 0.25f;
 
-	[Header("Lightning Effects")]
+	[Header("Lightning Damage Settings")]
 	public float minDamage = 5f;
 	public float maxDamage = 15f;
 	public float minRotationForce = 100f;
 	public float maxRotationForce = 300f;
 
-	[Header("Visual Effects")]
-	public Light lightningLight;
-	public float flashDuration = 0.1f;
-	public float flashIntensity = 8f;
+	[Header("Lighting Effects")]
+	public GameObject lightningParticlePrefab;
+	public float lightningEffectTime = 0.5f;
+	public float strikeRadius = 10f;
+	public Vector2 heightOfLightning = new Vector2(-5f, 5f);
 
 	[Header("Rain Settings")]
 	public ParticleSystem rainParticleSystem;
@@ -52,35 +53,16 @@ public class ThunderstormManager : MonoBehaviour
 
 	private float nextStrikeTime;
 	private bool isInThunderstorm;
-	private float initialLightIntensity;
 	private ParticleSystem.EmissionModule rainEmission;
 	private float currentFogDensity;
 	private Color currentFogColor;
 
 	private void Start()
 	{
-		SetupLightning();
 		SetupRain();
 		SetupFog();
 		SetupAudio();
 		SetNextStrikeTime();
-	}
-
-	private void SetupLightning()
-	{
-		if (lightningLight == null)
-		{
-			GameObject lightObj = new GameObject("LightningLight");
-			lightObj.transform.parent = transform;
-			lightningLight = lightObj.AddComponent<Light>();
-			lightningLight.type = LightType.Point;
-			lightningLight.intensity = 0f;
-			lightningLight.range = 100f;
-			lightningLight.color = Color.white;
-		}
-
-		initialLightIntensity = lightningLight.intensity;
-		lightningLight.intensity = 0f;
 	}
 
 	private void SetupAudio()
@@ -198,25 +180,36 @@ public class ThunderstormManager : MonoBehaviour
 
 	private IEnumerator StrikeLightning()
 	{
-		lightningLight.transform.position = rocketController.transform.position;
+		Vector2 randomCircle = Random.insideUnitCircle * strikeRadius;
+		Vector3 strikePosition = rocketController.transform.position +
+			new Vector3(randomCircle.x, Random.Range(heightOfLightning.x, heightOfLightning.y), randomCircle.y);
+
+		if (lightningParticlePrefab != null)
+		{
+			Quaternion effectRotation = Quaternion.Euler(
+				Random.Range(0f, 360f),
+				Random.Range(0f, 360f),
+				Random.Range(0f, 360f)
+			);
+
+			GameObject lightningEffect = Instantiate(lightningParticlePrefab,
+				strikePosition,
+				effectRotation);
+
+			Destroy(lightningEffect, lightningEffectTime);
+		}
 
 		float damage = Random.Range(minDamage, maxDamage);
 		rocketController.TakeDamage(damage);
 
-		Vector3 randomRotation = new Vector3(
+		Vector3 torqueRotation = new Vector3(
 			Random.Range(-1f, 1f),
 			Random.Range(-1f, 1f),
 			Random.Range(-1f, 1f)
 		);
 
 		float rotationForce = Random.Range(minRotationForce, maxRotationForce);
-		rocketController.rb.AddTorque(randomRotation * rotationForce, ForceMode.Impulse);
-
-		lightningLight.intensity = flashIntensity;
-
-		yield return new WaitForSeconds(flashDuration);
-
-		lightningLight.intensity = initialLightIntensity;
+		rocketController.rb.AddTorque(torqueRotation * rotationForce, ForceMode.Impulse);
 
 		float thunderDelay = Random.Range(minThunderDelay, maxThunderDelay);
 		yield return new WaitForSeconds(thunderDelay);
