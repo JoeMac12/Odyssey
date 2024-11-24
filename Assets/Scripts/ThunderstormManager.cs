@@ -120,6 +120,8 @@ public class ThunderstormManager : MonoBehaviour
 	{
 		if (rainParticleSystem != null)
 		{
+			rainParticleSystem.transform.rotation = Quaternion.identity;
+
 			float rainProgress = Mathf.InverseLerp(rainStartHeight, maxStormHeight, currentHeight);
 			float targetEmissionRate = Mathf.Lerp(baseEmissionRate, maxEmissionRate, rainProgress);
 
