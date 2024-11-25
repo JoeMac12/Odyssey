@@ -181,7 +181,7 @@ public class UpgradeManager : MonoBehaviour
 				currentTier = 0,
 				basePrice = 300,
 				baseValue = 0,
-				basePercentage = 2f,
+				basePercentage = 4f,
 				upgradeButton = moneyMultiplierButton,
 				upgradeText = moneyMultiplierText
 			}
