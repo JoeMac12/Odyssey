@@ -365,10 +365,10 @@ public class RocketController : MonoBehaviour
 			rb.AddRelativeTorque(0f, yawInput * yawRotationSpeed, 0f);
 		}
 
-		if (rotation.magnitude < 0.01f && yawInput == 0f && IsThrusting && currentFuel > 0f)
+		/*if (rotation.magnitude < 0.01f && yawInput == 0f && IsThrusting && currentFuel > 0f)
 		{
 			StraightenRocket(deltaEulerAngles);
-		}
+		}*/
 	}
 
 	float NormalizeAngle(float angle)
