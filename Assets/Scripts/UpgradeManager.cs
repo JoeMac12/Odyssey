@@ -15,6 +15,13 @@ public class UpgradeManager : MonoBehaviour
 	}
 
 	[System.Serializable]
+	public class UpgradePips
+	{
+		public string upgradeName;
+		public Image[] tierPips = new Image[10];
+	}
+
+	[System.Serializable]
 	public class Upgrade
 	{
 		public string name;
@@ -30,6 +37,7 @@ public class UpgradeManager : MonoBehaviour
 
 	public List<Upgrade> upgrades;
 	public List<RocketPart> rocketParts;
+	public List<UpgradePips> upgradePips;
 	public GameManager gameManager;
 	public RocketController rocketController;
 	public UISoundSystem uiSoundSystem;
@@ -46,6 +54,10 @@ public class UpgradeManager : MonoBehaviour
 	public TMP_Text hullUpgradeText;
 	public TMP_Text currentMoneyText;
 	public TMP_Text moneyMultiplierText;
+
+	[Header("Pip Colors")]
+	public Color unlockedPipColor = Color.green;
+	public Color lockedPipColor = Color.red;
 
 	[Header("Tooltip")]
 	public GameObject tooltipPanel;
@@ -76,6 +88,29 @@ public class UpgradeManager : MonoBehaviour
 			tooltipPanel.SetActive(false);
 		}
 		UpdateStatsDisplay();
+		UpdateAllPips();
+	}
+
+	private void UpdateUpgradePips(Upgrade upgrade)
+	{
+		var pips = upgradePips.Find(p => p.upgradeName == upgrade.name);
+		if (pips == null) return;
+
+		for (int i = 0; i < pips.tierPips.Length; i++)
+		{
+			if (pips.tierPips[i] != null)
+			{
+				pips.tierPips[i].color = i < upgrade.currentTier ? unlockedPipColor : lockedPipColor;
+			}
+		}
+	}
+
+	private void UpdateAllPips()
+	{
+		foreach (var upgrade in upgrades)
+		{
+			UpdateUpgradePips(upgrade);
+		}
 	}
 
 	private void InitializeRocketParts()
@@ -303,9 +338,15 @@ public class UpgradeManager : MonoBehaviour
 			upgrade.currentTier++;
 			ApplyUpgrade(upgrade);
 			UpdateUpgradeText(upgrade);
+			UpdateUpgradePips(upgrade);
 			UpdateCurrentMoneyText();
 			UpdateStatsDisplay();
 			UpdateRocketVisuals(upgrade);
+
+			if (upgrade.currentTier >= 10)
+			{
+				upgrade.upgradeButton.interactable = false;
+			}
 		}
 		else
 		{
