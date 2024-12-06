@@ -76,6 +76,13 @@ public class RocketController : MonoBehaviour
 	public float warningBeepInterval = 0.5f;
 	public float fallSpeedThreshold = -5f;
 
+	[Header("Damage Effects")]
+	public GameObject[] damageSpawnPoints;
+	public GameObject sparkParticlePrefab;
+	public AudioClip damageSound;
+	public float particleLifetime = 2f;
+	public AudioSource damageAudioSource;
+
 	private bool isWarningActive = false;
 	private float nextBeepTime = 0f;
 
@@ -465,6 +472,11 @@ public class RocketController : MonoBehaviour
 	{
 		currentHealth -= damage;
 
+		if (!isExploding)
+		{
+			SpawnDamageEffects();
+		}
+
 		if (currentHealth <= 0 && !isExploding)
 		{
 			StartCoroutine(ExplodeRocket());
@@ -476,6 +488,32 @@ public class RocketController : MonoBehaviour
 		if (hasLaunched && !IsExploded)
 		{
 			TakeDamage(currentHealth);
+		}
+	}
+
+	private void SpawnDamageEffects()
+	{
+		if (damageSpawnPoints == null || damageSpawnPoints.Length == 0 || sparkParticlePrefab == null)
+			return;
+
+		int randomIndex = Random.Range(0, damageSpawnPoints.Length);
+		Transform spawnPoint = damageSpawnPoints[randomIndex].transform;
+
+		if (spawnPoint != null)
+		{
+			GameObject sparkEffect = Instantiate(sparkParticlePrefab,
+				spawnPoint.position,
+				Quaternion.Euler(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)));
+
+			sparkEffect.transform.SetParent(transform);
+
+			Destroy(sparkEffect, particleLifetime);
+		}
+
+		if (damageAudioSource != null && damageSound != null)
+		{
+			damageAudioSource.pitch = Random.Range(0.95f, 1.05f);
+			damageAudioSource.PlayOneShot(damageSound, Random.Range(0.8f, 1f));
 		}
 	}
 
