@@ -464,7 +464,7 @@ public class RocketController : MonoBehaviour
 		}
 		if (armorText != null)
 		{
-			armorText.text = $"Damage Reduction: {armorPercentage:F0}%";
+			armorText.text = $"DMG Reduction: {armorPercentage:F0}%";
 		}
 	}
 
