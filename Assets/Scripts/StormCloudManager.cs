@@ -181,7 +181,9 @@ public class StormCloudManager : MonoBehaviour
 
 			if (cloud.isRocketInside && !rocketController.IsExploded)
 			{
-				rocketController.TakeDamage(lightningDamage);
+				float damageReduction = rocketController.armorPercentage / 100f;
+				float finalDamage = lightningDamage * (1f - damageReduction);
+				rocketController.TakeDamage(finalDamage);
 			}
 
 			StartCoroutine(RemoveLightningAfterDelay(cloud));
