@@ -151,7 +151,7 @@ public class WindManager : MonoBehaviour
 
 		float altitudeEffect = 1f + (rocket.transform.position.y * altitudeWindMultiplier);
 		float currentWindSpeed = baseWindSpeed * altitudeEffect;
-		string gustText = isGusting ? " (<color=red>Gusting</color>)" : "";
+		string gustText = isGusting ? " (<color=red>GUSTING!</color>)" : "";
 		windSpeedText.text = $"Wind Speed: {currentWindSpeed:F1} MPH{gustText}";
 	}
 
