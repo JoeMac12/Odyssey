@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5317940019406887520
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1215857079979927764}
+  - component: {fileID: 2614041736884152366}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1215857079979927764
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5317940019406887520}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2614041736884152366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5317940019406887520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816c1e873dfa7004fb6100968c39f2b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rocketController: {fileID: 0}
+  windManager: {fileID: 0}
+  upgradeManager: {fileID: 0}
+  cameraController: {fileID: 0}
+  uiStateManager: {fileID: 0}
+  maxAltitudeText: {fileID: 0}
+  maxSpeedText: {fileID: 0}
+  flightTimeText: {fileID: 0}
+  distanceTravelledText: {fileID: 0}
+  moneyEarnedText: {fileID: 0}
+  openUpgradeMenuButton: {fileID: 0}
+  closeUpgradeMenuButton: {fileID: 0}
+  selfDestructButton: {fileID: 0}
+  progressBarBackground: {fileID: 0}
+  rocketIcon: {fileID: 0}
+  maxBarHeight: 700
+  resumeButton: {fileID: 0}
+  mainMenuButton: {fileID: 0}
+  quitGameButton: {fileID: 0}
+  winAltitude: 100000
+  resetGameButton: {fileID: 0}
+  altitudeMultiplier: 0.1
+  speedMultiplier: 0.5
+  timeMultiplier: 8
+  distanceMultiplier: 0.2
+  blurManager: {fileID: 0}
+  musicManager: {fileID: 0}
+  uiSoundSystem: {fileID: 0}

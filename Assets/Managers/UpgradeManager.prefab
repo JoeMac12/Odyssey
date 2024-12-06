@@ -1,0 +1,185 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2200018388986578422
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 691103695124583893}
+  - component: {fileID: 8413305876580272773}
+  m_Layer: 0
+  m_Name: UpgradeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &691103695124583893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2200018388986578422}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8413305876580272773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2200018388986578422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d121857c6c12a4a41904d5d6bed79aa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  upgrades:
+  - name: 
+    description: 
+    currentTier: 0
+    basePrice: 0
+    baseValue: 0
+    basePercentage: 0
+    upgradeButton: {fileID: 0}
+    upgradeText: {fileID: 0}
+    partsChangeThreshold: 2
+  - name: 
+    description: 
+    currentTier: 0
+    basePrice: 0
+    baseValue: 0
+    basePercentage: 0
+    upgradeButton: {fileID: 0}
+    upgradeText: {fileID: 0}
+    partsChangeThreshold: 2
+  - name: 
+    description: 
+    currentTier: 0
+    basePrice: 0
+    baseValue: 0
+    basePercentage: 0
+    upgradeButton: {fileID: 0}
+    upgradeText: {fileID: 0}
+    partsChangeThreshold: 2
+  - name: 
+    description: 
+    currentTier: 0
+    basePrice: 0
+    baseValue: 0
+    basePercentage: 0
+    upgradeButton: {fileID: 0}
+    upgradeText: {fileID: 0}
+    partsChangeThreshold: 2
+  rocketParts:
+  - upgradeName: Engines
+    partObjects:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - upgradeName: Fuel Tanks
+    partObjects:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - upgradeName: Aerodynamics
+    partObjects:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  upgradePips:
+  - upgradeName: Engines
+    tierPips:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - upgradeName: Fuel Tanks
+    tierPips:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - upgradeName: Aerodynamics
+    tierPips:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - upgradeName: Hull
+    tierPips:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - upgradeName: Money Multiplier
+    tierPips:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  gameManager: {fileID: 0}
+  rocketController: {fileID: 0}
+  uiSoundSystem: {fileID: 0}
+  engineUpgradeButton: {fileID: 0}
+  fuelTankUpgradeButton: {fileID: 0}
+  aerodynamicsUpgradeButton: {fileID: 0}
+  hullUpgradeButton: {fileID: 0}
+  moneyMultiplierButton: {fileID: 0}
+  engineUpgradeText: {fileID: 0}
+  fuelTankUpgradeText: {fileID: 0}
+  aerodynamicsUpgradeText: {fileID: 0}
+  hullUpgradeText: {fileID: 0}
+  currentMoneyText: {fileID: 0}
+  moneyMultiplierText: {fileID: 0}
+  unlockedPipColor: {r: 0, g: 1, b: 0, a: 1}
+  lockedPipColor: {r: 1, g: 0, b: 0, a: 1}
+  tooltipPanel: {fileID: 0}
+  tooltipText: {fileID: 0}
+  statsPanel: {fileID: 0}
+  thrustStatsText: {fileID: 0}
+  fuelStatsText: {fileID: 0}
+  rotationStatsText: {fileID: 0}
+  armorStatsText: {fileID: 0}
+  moneyMultiplierStatsText: {fileID: 0}
