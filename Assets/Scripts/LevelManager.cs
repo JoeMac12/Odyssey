@@ -19,6 +19,11 @@ public class LevelManager : MonoBehaviour
 	public Button creditsButton;
 	public Button closeCreditsButton;
 
+	[Header("Options")]
+	public GameObject optionsUI;
+	public Button optionsButton;
+	public Button closeOptionsButton;
+
 	void Awake()
 	{
 		if (Instance == null)
@@ -37,6 +42,7 @@ public class LevelManager : MonoBehaviour
 		loadingScreen.SetActive(false);
 		UpdateMainMenu();
 		SetupCreditsButtons();
+		SetupOptionsButtons();
 	}
 
 	void SetupCreditsButtons()
@@ -57,12 +63,34 @@ public class LevelManager : MonoBehaviour
 		}
 	}
 
+	void SetupOptionsButtons()
+	{
+		if (optionsButton != null)
+		{
+			optionsButton.onClick.AddListener(ShowOptions);
+		}
+
+		if (closeOptionsButton != null)
+		{
+			closeOptionsButton.onClick.AddListener(HideOptions);
+		}
+
+		if (optionsUI != null)
+		{
+			optionsUI.SetActive(false);
+		}
+	}
+
 	void ShowCredits()
 	{
 		if (creditsUI != null)
 		{
 			creditsUI.SetActive(true);
 			mainMenuUI.SetActive(false);
+			if (optionsUI != null)
+			{
+				optionsUI.SetActive(false);
+			}
 		}
 	}
 
@@ -71,6 +99,28 @@ public class LevelManager : MonoBehaviour
 		if (creditsUI != null)
 		{
 			creditsUI.SetActive(false);
+			mainMenuUI.SetActive(true);
+		}
+	}
+
+	void ShowOptions()
+	{
+		if (optionsUI != null)
+		{
+			optionsUI.SetActive(true);
+			mainMenuUI.SetActive(false);
+			if (creditsUI != null)
+			{
+				creditsUI.SetActive(false);
+			}
+		}
+	}
+
+	void HideOptions()
+	{
+		if (optionsUI != null)
+		{
+			optionsUI.SetActive(false);
 			mainMenuUI.SetActive(true);
 		}
 	}
@@ -99,6 +149,10 @@ public class LevelManager : MonoBehaviour
 			if (creditsUI != null)
 			{
 				creditsUI.SetActive(false);
+			}
+			if (optionsUI != null)
+			{
+				optionsUI.SetActive(false);
 			}
 		}
 	}
