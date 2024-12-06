@@ -8,6 +8,7 @@ public class StormCloudManager : MonoBehaviour
 	public RocketController rocketController;
 	public GameObject stormCloudPrefab;
 	public GameObject lightningPrefab;
+	public ThunderSoundController thunderSoundController;
 
 	[Header("Spawn Settings")]
 	public float minSpawnHeight = 1000f;
@@ -162,6 +163,11 @@ public class StormCloudManager : MonoBehaviour
 
 			cloud.activeLightning = Instantiate(lightningPrefab, lightningPosition, Random.rotation);
 			cloud.activeLightning.transform.SetParent(cloud.cloudObject.transform);
+
+			if (cloud.isRocketInside && thunderSoundController != null)
+			{
+				thunderSoundController.PlayThunderSound();
+			}
 
 			if (cloud.isRocketInside && !rocketController.IsExploded)
 			{
