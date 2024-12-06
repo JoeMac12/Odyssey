@@ -233,6 +233,15 @@ public class StormCloudManager : MonoBehaviour
 		}
 	}
 
+	public void ClearAllStormClouds()
+	{
+		foreach (var cloud in activeStormClouds)
+		{
+			RemoveStormCloud(cloud);
+		}
+		activeStormClouds.Clear();
+	}
+
 	private void OnDisable()
 	{
 		foreach (var cloud in activeStormClouds)

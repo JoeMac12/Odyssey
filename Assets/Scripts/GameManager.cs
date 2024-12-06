@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 	public UpgradeManager upgradeManager;
 	public CameraController cameraController;
 	public UIStateManager uiStateManager;
+	public StormCloudManager stormCloudManager;
 
 	[Header("UI Elements")]
 	public TMP_Text maxAltitudeText;
@@ -173,6 +174,11 @@ public class GameManager : MonoBehaviour
 				rocketController.enabled = false;
 				rocketController.gameObject.SetActive(false);
 			}
+			if (stormCloudManager != null)
+			{
+				stormCloudManager.ClearAllStormClouds();
+				stormCloudManager.enabled = false;
+			}
 			StartCoroutine(ShowWinPanel());
 		}
 	}
@@ -325,6 +331,11 @@ public class GameManager : MonoBehaviour
 			cameraController.ResetCamera();
 		}
 		upgradeManager.ResetUpgrades();
+		if (stormCloudManager != null)
+		{
+			stormCloudManager.ClearAllStormClouds();
+			stormCloudManager.enabled = true;
+		}
 
 		uiStateManager.SetState(UIStateManager.UIState.GameplayUI);
 		windManager.GenerateNewWind();
