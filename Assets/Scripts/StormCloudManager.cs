@@ -28,8 +28,9 @@ public class StormCloudManager : MonoBehaviour
 	public float lightningLifetime = 0.5f;
 	public float lightningDamage = 10f;
 	public float lightningSpawnRadius = 15f;
+	public float insideLightningRad = 5f;
+	public float insideLightningHeight = 10f;
 
-	// Trying out cloud movemnt but I might remove cause rocket moves to fast
 	[Header("Cloud Settings")]
 	public float cloudDriftSpeed = 5f;
 	public float heightVariationSpeed = 2f;
@@ -39,7 +40,6 @@ public class StormCloudManager : MonoBehaviour
 	private float nextSpawnTime;
 	private const float spawnCheckInterval = 3f;
 
-	// storm cloud class
 	private class StormCloud
 	{
 		public GameObject cloudObject;
@@ -158,8 +158,18 @@ public class StormCloudManager : MonoBehaviour
 				Destroy(cloud.activeLightning);
 			}
 
-			Vector3 randomDirection = Random.insideUnitSphere * lightningSpawnRadius;
-			Vector3 lightningPosition = cloud.cloudObject.transform.position + randomDirection;
+			Vector3 lightningPosition;
+			if (cloud.isRocketInside)
+			{
+				Vector3 randomOffset = Random.insideUnitSphere * insideLightningRad;
+				randomOffset.y = insideLightningHeight;
+				lightningPosition = rocketController.transform.position + randomOffset;
+			}
+			else
+			{
+				Vector3 randomDirection = Random.insideUnitSphere * lightningSpawnRadius;
+				lightningPosition = cloud.cloudObject.transform.position + randomDirection;
+			}
 
 			cloud.activeLightning = Instantiate(lightningPrefab, lightningPosition, Random.rotation);
 			cloud.activeLightning.transform.SetParent(cloud.cloudObject.transform);
